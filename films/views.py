@@ -1,7 +1,5 @@
 from django.shortcuts import render
 from django.shortcuts import HttpResponse
-
-from students.models import Student
 from django.views.generic import TemplateView
 
 """
@@ -13,7 +11,7 @@ def show_students(request):
         result += s.name + "<br>"
     
     return HttpResponse(result)
-"""
+
 
 class ShowStudentsView(TemplateView):
     template_name = "students/show_students.html"
@@ -24,3 +22,4 @@ class ShowStudentsView(TemplateView):
         print("got_extra_data")
 
         return context
+"""
