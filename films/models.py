@@ -3,11 +3,11 @@ from django.db import models
 class Film(models.Model):
     name = models.TextField("Название")
     description = models.TextField("Описание")
-    rating = models.IntegerField("Рейтинг")
+    rating = models.FloatField("Рейтинг")
     release_date = models.DateField("Дата выхода")
 
-    director = models.ForeignKey("Director", on_delete=models.CASCADE, null=True)
-    genre = models.ForeignKey("Genre", on_delete=models.CASCADE)
+    director = models.ManyToManyField("Director", related_name="films")
+    genre = models.ForeignKey("Genre", on_delete=models.CASCADE, null=True)
     actors = models.ManyToManyField("Actor", related_name="films")
 
     class Meta:
@@ -19,6 +19,9 @@ class Film(models.Model):
 
 class Genre(models.Model):
     name = models.TextField("Название")
+
+    def __str__(self) -> str:
+        return self.name
 
     class Meta:
         verbose_name = "Жанр"
@@ -39,6 +42,9 @@ class Director(models.Model):
     birth_date = models.DateField("Дата рождения", null=True, blank=True)
     biography = models.TextField("Биография", null=True, blank=True)
 
+    def __str__(self) -> str:
+            return self.name
+
     class Meta:
         verbose_name = "Режиссер"
         verbose_name_plural = "Режиссеры"
@@ -47,6 +53,9 @@ class Actor(models.Model):
     name = models.TextField("ФИО")
     birth_date = models.DateField("Дата рождения", null=True, blank=True)
     biography = models.TextField("Биография", null=True, blank=True)
+
+    def __str__(self) -> str:
+            return self.name
 
     class Meta:
         verbose_name = "Актер"

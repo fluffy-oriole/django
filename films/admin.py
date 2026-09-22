@@ -3,11 +3,11 @@ from films.models import Film, Genre, Review, Director, Actor
 
 @admin.register(Film)
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["name", "release_date", "director"]
+    list_display = ["name", "release_date", "rating", "genre"]
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
-    list_name = ["name"]
+    pass
 
 @admin.register(Review)
 class ReviewAdmin(admin.ModelAdmin):
@@ -19,4 +19,4 @@ class DirectorAdmin(admin.ModelAdmin):
 
 @admin.register(Actor)
 class ActorAdmin(admin.ModelAdmin):
-    list_dispalay = ["name", "birth_date"]
+    list_display = ["name", "birth_date"]
