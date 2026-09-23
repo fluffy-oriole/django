@@ -6,7 +6,7 @@ class Film(models.Model):
     rating = models.FloatField("Рейтинг")
     release_date = models.DateField("Дата выхода")
 
-    director = models.ManyToManyField("Director", related_name="films")
+    directors = models.ManyToManyField("Director", related_name="films")
     genre = models.ForeignKey("Genre", on_delete=models.CASCADE, null=True)
     actors = models.ManyToManyField("Actor", related_name="films")
 

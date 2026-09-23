@@ -18,10 +18,14 @@ from django.contrib import admin
 from django.urls import path, include
 from films import views
 from rest_framework.routers import DefaultRouter
-from films.api import FilmsViewset
+from films.api import FilmsViewset, GenresViewset, ActorsViewset, DirectorsViewset, ReviewsViewset
 
 router = DefaultRouter()
 router.register('films', FilmsViewset, basename='films')
+router.register('genres', GenresViewset, basename='genres')
+router.register('actors', ActorsViewset, basename='actors')
+router.register('directors', DirectorsViewset, basename='directors')
+router.register('reviews', ReviewsViewset, basename='reviews')
 
 urlpatterns = [
     path('admin/', admin.site.urls),
