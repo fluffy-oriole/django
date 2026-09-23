@@ -1,15 +1,10 @@
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
+from films.models import Film
+from films.serializers import FilmSerializer
 
 
-"""
-class StudentsViewset(
-    # mixins.CreateModelMixin,
-    mixins.UpdateModelMixin,
-    mixins.ListModelMixin,
-    # mixins.RetrieveModelMixin,
-    GenericViewSet
-):
-    queryset = Student.objects.all()
-    serializer_class = StudentSerializer
-"""
+
+class FilmsViewset(mixins.ListModelMixin, GenericViewSet):
+    queryset = Film.objects.all()
+    serializer_class = FilmSerializer
