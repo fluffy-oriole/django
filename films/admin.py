@@ -1,9 +1,9 @@
 from django.contrib import admin
-from films.models import Film, Genre, Review, Director, Actor
+from films.models import Film, Genre, Review, Director, Actor, Collection
 
 @admin.register(Film)
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["name", "release_date", "rating", "genre"]
+    list_display = ["name", "release_date", "rating", "genre", "subscription_tag"]
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
@@ -20,3 +20,7 @@ class DirectorAdmin(admin.ModelAdmin):
 @admin.register(Actor)
 class ActorAdmin(admin.ModelAdmin):
     list_display = ["name", "birth_date"]
+
+@admin.register(Collection)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ["name", "description", ""]

@@ -1,7 +1,7 @@
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
-from films.models import Director, Film, Genre, Review, Actor
-from films.serializers import DirectorSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer
+from films.models import Collection, Director, Film, Genre, Review, Actor
+from films.serializers import DirectorSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer, CollectionSerializer
 
 
 
@@ -54,3 +54,13 @@ class ReviewsViewset(
                 GenericViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+
+class CollectionsViewset(
+                mixins.ListModelMixin,
+                mixins.CreateModelMixin,
+                mixins.UpdateModelMixin,
+                mixins.RetrieveModelMixin,
+                mixins.DestroyModelMixin,
+                GenericViewSet):
+    queryset = Collection.objects.all()
+    serializer_class = CollectionSerializer

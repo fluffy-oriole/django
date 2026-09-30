@@ -60,3 +60,16 @@ class Actor(models.Model):
     class Meta:
         verbose_name = "Актер"
         verbose_name_plural = "Актеры"
+
+
+class Collection(models.Model):
+    name = models.TextField("Название")
+    films = models.ManyToManyField("Film", related_name="collections")
+    price = models.FloatField("Цена")
+
+    def __str__(self) -> str:
+        return self.name
+
+    class Meta:
+        verbose_name = "Коллекция фильмов"
+        verbose_name_plural = "Коллекции фильмов"
