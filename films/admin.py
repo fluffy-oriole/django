@@ -3,7 +3,7 @@ from films.models import Film, Genre, Review, Director, Actor, Collection
 
 @admin.register(Film)
 class FilmAdmin(admin.ModelAdmin):
-    list_display = ["name", "release_date", "rating", "genre", "subscription_tag"]
+    list_display = ["name", "rating", "genre"]
 
 @admin.register(Genre)
 class GenreAdmin(admin.ModelAdmin):
@@ -23,4 +23,4 @@ class ActorAdmin(admin.ModelAdmin):
 
 @admin.register(Collection)
 class CollectionAdmin(admin.ModelAdmin):
-    list_display = ["name", "description", ""]
+    list_display = ["name"]

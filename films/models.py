@@ -1,10 +1,10 @@
 from django.db import models
 
+
 class Film(models.Model):
     name = models.TextField("Название")
     description = models.TextField("Описание")
     rating = models.FloatField("Рейтинг")
-    release_date = models.DateField("Дата выхода")
 
     directors = models.ManyToManyField("Director", related_name="films")
     genre = models.ForeignKey("Genre", on_delete=models.CASCADE, null=True)

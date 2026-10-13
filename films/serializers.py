@@ -21,12 +21,9 @@ class ActorSerializer(serializers.ModelSerializer):
 
 
 class FilmSerializer(serializers.ModelSerializer):
-    genre = GenreSerializer(read_only=True)
-    directors = DirectorSerializer(read_only=True)
-    actors = ActorSerializer(many=True, read_only=True)
     class Meta:
         model = Film
-        fields = ['id', 'name', 'genre', 'release_date', 'rating', 'directors', 'actors']
+        fields = ["id", "name", "description", "rating", "genre", "directors", "actors"]
 
 
 class ReviewSerializer(serializers.ModelSerializer):
