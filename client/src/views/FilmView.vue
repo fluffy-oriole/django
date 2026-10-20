@@ -117,7 +117,7 @@ async function onUpdateFilm() {
     </div>
 
 
-    <div class="main-container">
+    <div class="container">
         <div v-if="loading">Загрузка...:/</div>
 
         <strong><div>Фильмы</div></strong>
@@ -217,11 +217,5 @@ async function onUpdateFilm() {
     align-content: center;
     align-items: center;
     gap: 16px;
-}
-
-.main-container {
-    width: 100%;
-    height: 100%;
-    padding: 2rem;
 }
 </style>

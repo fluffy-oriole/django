@@ -35,7 +35,7 @@ const router = createRouter({
       component: DirectorView
     },
     {
-      path: '/collection',
+      path: '/collections',
       name: 'CollectionView',
       component: CollectionView
     },

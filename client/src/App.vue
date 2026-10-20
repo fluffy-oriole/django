@@ -14,22 +14,22 @@ import axios from "axios";
         <div class="collapse navbar-collapse" id="navbarNavDropdown">
             <ul class="navbar-nav">
             <li class="nav-item active">
-                <router-link class="nav-link" to="/films">Films</router-link>
+                <router-link class="nav-link" to="/films">Фильмы</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" to="/genres">Genres</router-link>
+                <router-link class="nav-link" to="/genres">Жанры</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" to="/reviews">Reviews</router-link>
+                <router-link class="nav-link" to="/reviews">Отзывы</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" to="/directors">Directors</router-link>
+                <router-link class="nav-link" to="/directors">Режиссеры</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" to="/actors">Actors</router-link>
+                <router-link class="nav-link" to="/actors">Актеры</router-link>
             </li>
             <li class="nav-item">
-                <router-link class="nav-link" to="/collections">Collections</router-link>
+                <router-link class="nav-link" to="/collections">Коллекции</router-link>
             </li>
             </ul>
         </div>
