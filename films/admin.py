@@ -1,5 +1,5 @@
 from django.contrib import admin
-from films.models import Film, Genre, Review, Director, Actor, Collection
+from films.models import Film, Genre, Review, Director, Actor, Collection, Profile
 
 @admin.register(Film)
 class FilmAdmin(admin.ModelAdmin):
@@ -24,3 +24,9 @@ class ActorAdmin(admin.ModelAdmin):
 @admin.register(Collection)
 class CollectionAdmin(admin.ModelAdmin):
     list_display = ["name"]
+
+@admin.register(Profile)
+class CollectionAdmin(admin.ModelAdmin):
+    list_display = ["user", "role"]
+    def has_add_permission(self, request):
+        return False

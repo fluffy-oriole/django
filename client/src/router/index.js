@@ -5,10 +5,22 @@ import ActorView from '@/views/ActorView.vue'
 import DirectorView from '@/views/DirectorView.vue'
 import CollectionView from '@/views/CollectionView.vue'
 import ReviewView from '@/views/ReviewView.vue'
+import MainPage from '@/views/MainPage.vue'
+import LoginPage from '@/views/LoginPage.vue'
 
 const router = createRouter({
   history: createWebHistory(import.meta.env.BASE_URL),
   routes: [
+    {
+      path: '/',
+      name: 'MainView',
+      component: MainPage
+    },
+    {
+      path: '/login',
+      name: 'LoginView',
+      component: LoginPage
+    },
     {
       path: '/films',
       name: 'FilmView',
