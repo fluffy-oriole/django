@@ -1,3 +1,20 @@
+<script setup>
+import axios from 'axios';
+import {onBeforeMount, ref} from 'vue';
+
+const is_authenticated = ref(false)
+
+async function fetchMe() {
+    const r = await axios.get("api/profile/me");
+    console.log(r.data);
+    is_authenticated.value = r.data.is_authenticated;
+}
+
+onBeforeMount( () => {
+    fetchMe();
+})
+</script>
+
 <template>
 <nav class="navbar navbar-expand-lg navbar-light bg-light">
     <a class="navbar-brand" href="#">Navbar</a>
