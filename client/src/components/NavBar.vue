@@ -1,18 +1,25 @@
 <script setup>
 import axios from 'axios';
+import Cookies from 'js-cookie';
 import {onBeforeMount, ref} from 'vue';
 
 const is_authenticated = ref(false)
 
 async function fetchMe() {
     const r = await axios.get("api/profile/me");
-    console.log(r.data);
+    axios.defaults.headers.common['X-CSRFToken'] = Cookies.get("csrftoken");
     is_authenticated.value = r.data.is_authenticated;
 }
 
 onBeforeMount( () => {
     fetchMe();
 })
+
+
+async function onLogoutButtonClick() {
+    const r = await axios.post('/api/profile/logout/');
+    fetchMe();
+}
 </script>
 
 <template>
@@ -21,27 +28,34 @@ onBeforeMount( () => {
     <button class="navbar-toggler" type="button" data-toggle="collapse" data-target="#navbarNavDropdown" aria-controls="navbarNavDropdown" aria-expanded="false" aria-label="Toggle navigation">
         <span class="navbar-toggler-icon"></span>
     </button>
-    <div class="collapse navbar-collapse" id="navbarNavDropdown">
+    <div class="collapse navbar-collapse justify-content-between" id="navbarNavDropdown">
         <ul class="navbar-nav">
-        <li class="nav-item active">
-            <router-link class="nav-link" to="/films">Фильмы</router-link>
-        </li>
-        <li class="nav-item">
-            <router-link class="nav-link" to="/genres">Жанры</router-link>
-        </li>
-        <li class="nav-item">
-            <router-link class="nav-link" to="/reviews">Отзывы</router-link>
-        </li>
-        <li class="nav-item">
-            <router-link class="nav-link" to="/directors">Режиссеры</router-link>
-        </li>
-        <li class="nav-item">
-            <router-link class="nav-link" to="/actors">Актеры</router-link>
-        </li>
-        <li class="nav-item">
-            <router-link class="nav-link" to="/collections">Коллекции</router-link>
-        </li>
+            <li class="nav-item active">
+                <router-link class="nav-link" to="/films">Фильмы</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link" to="/genres">Жанры</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link" to="/reviews">Отзывы</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link" to="/directors">Режиссеры</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link" to="/actors">Актеры</router-link>
+            </li>
+            <li class="nav-item">
+                <router-link class="nav-link" to="/collections">Коллекции</router-link>
+            </li>
         </ul>
+        <div role="search">
+            Авторизован ли: {{ is_authenticated }}
+            <button v-if="is_authenticated" class="btn btn-outline-success" @click="onLogoutButtonClick">
+                Выйти
+            </button>
+        </div>
+            
         
         <ul class="navbar-nav">
             <li class="nav-item dropdown">

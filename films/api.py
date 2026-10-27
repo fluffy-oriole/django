@@ -4,6 +4,9 @@ from rest_framework import mixins
 from films.models import Collection, Director, Film, Genre, Review, Actor
 from films.serializers import DirectorSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer, CollectionSerializer
 from django.contrib.auth.models import User
+from django.contrib.auth import logout as django_logout
+from django.contrib.auth import login as django_login
+from django.contrib.auth import authenticate
 from rest_framework.decorators import action
 
 
@@ -82,3 +85,9 @@ class ProfileViewSet(GenericViewSet):
                 "role": self.request.user.profile.role
             })
         return Response(data=data)
+
+    @action(detail=False, url_path='logout', methods=['POST'])
+    def logout(self, *args, **kwargs):
+        django_logout(self.request)
+
+        return Response()
