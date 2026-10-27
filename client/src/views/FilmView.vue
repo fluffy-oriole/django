@@ -7,7 +7,6 @@ const films = ref([]);
 const loading = ref(false);
 const filmToAdd = ref({});
 const filmToEdit = ref({})
-// const filmsPictureRef = ref();
 const genres = ref([]);
 const actors = ref([]);
 const directors = ref([]);

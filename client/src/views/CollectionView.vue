@@ -160,11 +160,7 @@ async function onUpdateCollection() {
 
         <strong><div>Коллекции</div></strong>
 
-        <div
-            v-for="collection in collections"
-            :key="collection.id"
-            class="show-block"
-        >
+        <div v-for="collection in collections" :key="collection.id" class="show-block">
             <div>
                 <strong>{{ collection.name }}</strong>
                 <div>Цена: {{ collection.price }}</div>
@@ -172,9 +168,7 @@ async function onUpdateCollection() {
                 <div v-if="collection.films">
                     Фильмы:
                     <span v-if="Array.isArray(collection.films)">
-                        {{ collection.films
-                            .map(film => typeof film === 'object' ? film.name : films.find(f => f.id === film)?.name ?? film)
-                            .join(', ') }}
+                        {{ collection.films.map(film => typeof film === 'object' ? film.name : films.find(f => f.id === film)?.name ?? film).join(', ') }}
                     </span>
                 </div>
             </div>
