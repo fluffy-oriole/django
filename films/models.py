@@ -10,6 +10,8 @@ class Film(models.Model):
     genre = models.ForeignKey("Genre", on_delete=models.CASCADE, null=True)
     actors = models.ManyToManyField("Actor", related_name="films")
 
+    picture = models.ImageField("Изображение", null=True, upload_to="films")
+
     class Meta:
         verbose_name = "Фильм"
         verbose_name_plural = "Фильмы"
@@ -53,6 +55,8 @@ class Actor(models.Model):
     name = models.TextField("ФИО")
     birth_date = models.DateField("Дата рождения", null=True, blank=True)
     biography = models.TextField("Биография", null=True, blank=True)
+
+    picture = models.ImageField("Изображение", null=True, upload_to="actors")
 
     def __str__(self) -> str:
             return self.name

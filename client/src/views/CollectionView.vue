@@ -8,6 +8,7 @@ const collections = ref([]);
 const films = ref([]);
 const loading = ref(false);
 const collectionToAdd = ref({});
+const collectionToEdit = ref({});
 
 async function fetchCollections() {
     loading.value = true;
@@ -49,9 +50,111 @@ async function onRemoveCollection(collection) {
     await axios.delete(`/api/collections/${collection.id}/`);
     await fetchCollections();
 }
+
+async function onCollectionEditClick(collection) {
+    collectionToEdit.value = {
+        ...collection,
+        films: collection.films.map(film =>
+            typeof film === 'object' ? film.id : film
+        ),
+    };
+}
+
+async function onUpdateCollection() {
+    await axios.patch(
+        `/api/collections/${collectionToEdit.value.id}/`,
+        {
+            ...collectionToEdit.value,
+        }
+    );
+
+    await fetchCollections();
+}
+
 </script>
 
 <template>
+    <div
+        class="modal fade"
+        id="editCollectionModal"
+        tabindex="-1"
+        aria-hidden="true"
+    >
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать коллекцию</h5>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Закрыть"
+                    ></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="collectionToEdit.name"
+                            required
+                        />
+                        <label>Название коллекции</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <select
+                            class="form-select"
+                            v-model="collectionToEdit.films"
+                            multiple
+                            required
+                        >
+                            <option
+                                v-for="film in films"
+                                :key="film.id"
+                                :value="film.id"
+                            >
+                                {{ film.name }}
+                            </option>
+                        </select>
+                        <label>Фильмы</label>
+                    </div>
+
+                    <div class="form-floating">
+                        <input
+                            type="number"
+                            step="0.01"
+                            class="form-control"
+                            v-model.number="collectionToEdit.price"
+                            required
+                        />
+                        <label>Цена</label>
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Отмена
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                        @click="onUpdateCollection"
+                    >
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div v-if="loading">Загрузка...</div>
 
@@ -75,6 +178,15 @@ async function onRemoveCollection(collection) {
                     </span>
                 </div>
             </div>
+
+            <button
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#editCollectionModal"
+                @click="onCollectionEditClick(collection)"
+            >
+                <i class="bi bi-pencil"></i>
+            </button>
 
             <button
                 class="btn btn-danger"
@@ -150,7 +262,7 @@ async function onRemoveCollection(collection) {
     border: 1px solid;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     align-content: center;
     align-items: center;
     gap: 16px;

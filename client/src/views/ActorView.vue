@@ -7,15 +7,17 @@ import axios from 'axios';
 const actors = ref([]);
 const loading = ref(false);
 const actorToAdd = ref({});
+const actorToEdit = ref({});
+const actorsPictureRef = ref();
+const actorAddImageUrl = ref();
+
+
 
 async function fetchActors() {
     loading.value = true;
-    try {
-        const r = await axios.get('/api/actors/');
-        actors.value = r.data;
-    } finally {
-        loading.value = false;
-    }
+    const r = await axios.get('/api/actors/');
+    actors.value = r.data;
+    loading.value = false;
 }
 
 onBeforeMount(() => {
@@ -24,12 +26,50 @@ onBeforeMount(() => {
 });
 
 async function onActorAdd() {
-    await axios.post('/api/actors/', {
-        ...actorToAdd.value,
-    });
+    const formData = new FormData();
 
-    actorToAdd.value = {};
+    formData.append('picture', actorsPictureRef.value.files[0]);
+    formData.set('name', actorToAdd.value.name);
+    formData.set('birth_date', actorToAdd.value.birth_date);
+    formData.set('biography', actorToAdd.value.biography);
+
+    await axios.post('/api/actors/', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data',
+        },
+    });
     await fetchActors();
+}
+
+const actorEditPictureRef = ref();
+
+async function onActorEditClick(actor) {
+    actorToEdit.value = { ...actor };
+}
+
+async function onUpdateActor() {
+    const formData = new FormData();
+
+    formData.set('name', actorToEdit.value.name);
+    formData.set('birth_date', actorToEdit.value.birth_date || '');
+    formData.set('biography', actorToEdit.value.biography || '');
+
+    const file = actorEditPictureRef.value?.files?.[0];
+
+    if (file) {
+        formData.append('picture', file);
+    }
+
+    await axios.patch(
+        `/api/actors/${actorToEdit.value.id}/`,
+        formData
+    );
+
+    await fetchActors();
+}
+
+async function actorAddPictureChange() {
+    actorAddImageUrl.value = URL.createObjectURL(actorsPictureRef.value.files[0]);
 }
 
 async function onRemoveActor(actor) {
@@ -39,6 +79,80 @@ async function onRemoveActor(actor) {
 </script>
 
 <template>
+    <div class="modal fade" id="editActorModal" tabindex="-1" aria-hidden="true">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h5 class="modal-title">Редактировать актёра</h5>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Закрыть"
+                    ></button>
+                </div>
+
+                <div class="modal-body">
+                    <div class="form-floating mb-3">
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="actorToEdit.name"
+                            required
+                        />
+                        <label>ФИО</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <input
+                            type="date"
+                            class="form-control"
+                            v-model="actorToEdit.birth_date"
+                        />
+                        <label>Дата рождения</label>
+                    </div>
+
+                    <div class="form-floating mb-3">
+                        <textarea
+                            class="form-control"
+                            v-model="actorToEdit.biography"
+                        ></textarea>
+                        <label>Биография</label>
+                    </div>
+
+                    <div class="mb-3">
+                        <label class="form-label">Новая фотография</label>
+                        <input
+                            type="file"
+                            class="form-control"
+                            ref="actorEditPictureRef"
+                            accept="image/*"
+                        />
+                    </div>
+                </div>
+
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Закрыть
+                    </button>
+
+                    <button
+                        type="button"
+                        class="btn btn-primary"
+                        data-bs-dismiss="modal"
+                        @click="onUpdateActor"
+                    >
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div v-if="loading">Загрузка...</div>
 
@@ -60,6 +174,15 @@ async function onRemoveActor(actor) {
                     {{ actor.biography }}
                 </div>
             </div>
+
+            <button
+                class="btn btn-success"
+                @click="onActorEditClick(actor)"
+                data-bs-toggle="modal"
+                data-bs-target="#editActorModal"
+            >
+                <i class="bi bi-pen-fill"></i>
+            </button>
 
             <button
                 class="btn btn-danger"
@@ -107,6 +230,11 @@ async function onRemoveActor(actor) {
                 </div>
 
                 <div class="col-auto">
+                    <input :src="actorAddImageUrl" type="file" class="form-control" ref="actorsPictureRef">
+                </div>
+
+
+                <div class="col-auto">
                     <button type="submit" class="btn btn-primary">
                         Добавить
                     </button>
@@ -123,7 +251,7 @@ async function onRemoveActor(actor) {
     border: 1px solid;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     align-content: center;
     align-items: center;
     gap: 16px;

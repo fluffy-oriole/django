@@ -10,12 +10,10 @@ const genreToEdit = ref({});
 
 async function fetchGenres() {
     loading.value = true;
-    try {
-        const r = await axios.get('/api/genres/');
-        genres.value = r.data;
-    } finally {
-        loading.value = false;
-    }
+    const r = await axios.get('/api/genres/');
+    console.log(r.data);
+    genres.value = r.data;
+    loading.value = false;
 }
 
 onBeforeMount(() => {

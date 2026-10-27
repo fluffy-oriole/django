@@ -6,6 +6,7 @@ import axios from 'axios';
 const directors = ref([]);
 const loading = ref(false);
 const directorToAdd = ref({});
+const directorToEdit = ref({});
 
 async function fetchDirectors() {
     loading.value = true;
@@ -35,9 +36,92 @@ async function onRemoveDirector(director) {
     await axios.delete(`/api/directors/${director.id}/`);
     await fetchDirectors();
 }
+
+async function onDirectorEditClick(director) {
+    directorToEdit.value = { ...director };
+}
+
+async function onUpdateDirector() {
+    await axios.put(`/api/directors/${directorToEdit.value.id}/`, {
+    ...directorToEdit.value,
+    });
+    await fetchDirectors();
+}
 </script>
 
 <template>
+    <div class="modal fade" id="editDirectorModal" tabindex="-1">
+        <div class="modal-dialog">
+            <div class="modal-content">
+                <div class="modal-header">
+                    <h1 class="modal-title fs-5">
+                        редактировать режиссёра
+                    </h1>
+                    <button
+                        type="button"
+                        class="btn-close"
+                        data-bs-dismiss="modal"
+                        aria-label="Close"
+                    ></button>
+                </div>
+                <div class="modal-body">
+                    <div class="row">
+                        <div class="col">
+                            <div class="form-floating">
+                                <input
+                                    type="text"
+                                    class="form-control"
+                                    v-model="directorToEdit.name"
+                                />
+                                <label>ФИО</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <div class="form-floating">
+                                <input
+                                    type="date"
+                                    class="form-control"
+                                    v-model="directorToEdit.birth_date"
+                                />
+                                <label>Дата рождения</label>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="row mt-3">
+                        <div class="col">
+                            <div class="form-floating">
+                                <textarea
+                                    class="form-control"
+                                    v-model="directorToEdit.biography"
+                                ></textarea>
+                                <label>Биография</label>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+                <div class="modal-footer">
+                    <button
+                        type="button"
+                        class="btn btn-secondary"
+                        data-bs-dismiss="modal"
+                    >
+                        Закрыть
+                    </button>
+                    <button
+                        data-bs-dismiss="modal"
+                        type="button"
+                        class="btn btn-primary"
+                        @click="onUpdateDirector"
+                    >
+                        Сохранить
+                    </button>
+                </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div v-if="loading">Загрузка...</div>
 
@@ -57,6 +141,15 @@ async function onRemoveDirector(director) {
                     {{ director.biography }}
                 </div>
             </div>
+
+            <button
+                class="btn btn-success"
+                @click="onDirectorEditClick(director)"
+                data-bs-toggle="modal"
+                data-bs-target="#editDirectorModal"
+            >
+                <i class="bi bi-pen-fill"></i>
+            </button>
 
             <button
                 class="btn btn-danger"
@@ -120,7 +213,7 @@ async function onRemoveDirector(director) {
     border: 1px solid;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 1fr auto;
+    grid-template-columns: 1fr auto auto;
     align-content: center;
     align-items: center;
     gap: 16px;
