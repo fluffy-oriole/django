@@ -1,24 +1,18 @@
 <script setup>
-import axios from 'axios';
-import Cookies from 'js-cookie';
-import {onBeforeMount, ref} from 'vue';
+import { storeToRefs } from 'pinia';
+import useProfileStore from '@/stores/profileStore';
 
-const is_authenticated = ref(false)
 
-async function fetchMe() {
-    const r = await axios.get("api/profile/me");
-    axios.defaults.headers.common['X-CSRFToken'] = Cookies.get("csrftoken");
-    is_authenticated.value = r.data.is_authenticated;
-}
+const profileStore = useProfileStore();
+const {
+    is_authenticated,
+    user_name,
 
-onBeforeMount( () => {
-    fetchMe();
-})
+} = storeToRefs(profileStore)
 
 
 async function onLogoutButtonClick() {
-    const r = await axios.post('/api/profile/logout/');
-    fetchMe();
+    profileStore.logout();
 }
 </script>
 
@@ -50,7 +44,7 @@ async function onLogoutButtonClick() {
             </li>
         </ul>
         <div role="search">
-            Авторизован ли: {{ is_authenticated }}
+            Авторизован ли: {{ user_name }}
             <button v-if="is_authenticated" class="btn btn-outline-success" @click="onLogoutButtonClick">
                 Выйти
             </button>

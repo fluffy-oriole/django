@@ -80,7 +80,7 @@ class ProfileViewSet(GenericViewSet):
         }
         if self.request.user.is_authenticated:
             data.update({
-                "username": self.request.user.username,
+                "user_name": self.request.user.username,
                 "id": self.request.user.id,
                 "role": self.request.user.profile.role
             })
@@ -91,3 +91,20 @@ class ProfileViewSet(GenericViewSet):
         django_logout(self.request)
 
         return Response()
+
+
+    @action(detail=False, url_path='login', methods=['POST'])
+    def login(self, *args, **kwargs):
+        username = self.request.data['username']
+        password = self.request.data['password']
+
+        success = False
+        status_code = 403
+
+        user = authenticate(username=username, password=password)
+        if user:
+            success = True
+            status_code = 200
+            django_login(self.request, user)
+
+        return Response({'success': success, 'status': status_code})
