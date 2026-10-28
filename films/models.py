@@ -75,6 +75,7 @@ class Actor(models.Model):
     biography = models.TextField("Биография", null=True, blank=True)
 
     picture = models.ImageField("Изображение", null=True, upload_to="actors")
+    
 
     def __str__(self) -> str:
             return self.name

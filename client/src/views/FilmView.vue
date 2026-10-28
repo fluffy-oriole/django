@@ -11,7 +11,9 @@ const genres = ref([]);
 const actors = ref([]);
 const directors = ref([]);
 const filmPictureRef = ref();
+const filmEditPictureRef = ref();
 const filmAddImageUrl = ref();
+const filmEditImageUrl = ref();
 
 async function fetchDirectors() {
     loading.value = true;
@@ -92,18 +94,45 @@ async function onRemoveFilm(film) {
 
 async function onFilmEditClick(film) {
     filmToEdit.value = { ...film };
+    filmEditImageUrl.value = film.picture;
 }
 
 
 async function onUpdateFilm() {
-    await axios.put(`/api/films/${filmToEdit.value.id}/`, {
-    ...filmToEdit.value,
+    const formData = new FormData();
+
+    formData.set('name', filmToEdit.value.name);
+    formData.set('description', filmToEdit.value.description);
+    formData.set('rating', filmToEdit.value.rating);
+    formData.set('genre', filmToEdit.value.genre);
+
+    for (const d of filmToEdit.value.directors) {
+        formData.append('directors', d);
+    }
+
+    for (const a of filmToEdit.value.actors) {
+        formData.append('actors', a);
+    }
+
+    const picture = filmEditPictureRef.value.files[0];
+    if (picture) {
+        formData.append('picture', picture);
+    }
+
+    await axios.put(`/api/films/${filmToEdit.value.id}/`, formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
     });
     await fetchFilms();
 }
 
 async function filmsAddPictureChange() {
     filmAddImageUrl.value = URL.createObjectURL(filmPictureRef.value.files[0]);
+}
+
+async function filmEditPictureChange() {
+    filmEditImageUrl.value = URL.createObjectURL(filmEditPictureRef.value.files[0]);
 }
 
 </script>
@@ -210,7 +239,17 @@ async function filmsAddPictureChange() {
                             </div>
                         </div>
                     </div>
+                    <div class="row" mt-3>
+                        <div class="col-auto">
+                            <input type="file" class="form-control" ref="filmEditPictureRef" @change="filmEditPictureChange"/>
+                        </div>
+
+                        <div class="col-auto">
+                            <img :src="filmEditImageUrl" style="max-height: 60px;" alt="">
+                        </div>
+                    </div>
                 </div>
+                
                 <div class="modal-footer">
                     <button
                         type="button"

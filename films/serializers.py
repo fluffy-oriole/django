@@ -23,7 +23,7 @@ class ActorSerializer(serializers.ModelSerializer):
 class FilmSerializer(serializers.ModelSerializer):
     class Meta:
         model = Film
-        fields = ["id", "name", "description", "rating", "genre", "directors", "actors", "picture"]
+        fields =  "__all__"
 
 
 class ReviewSerializer(serializers.ModelSerializer):
