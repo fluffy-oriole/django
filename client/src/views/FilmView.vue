@@ -5,11 +5,13 @@ import axios from "axios";
 
 const films = ref([]);
 const loading = ref(false);
-const filmToAdd = ref({});
-const filmToEdit = ref({})
+const filmToAdd = ref([]);
+const filmToEdit = ref([])
 const genres = ref([]);
 const actors = ref([]);
 const directors = ref([]);
+const filmPictureRef = ref();
+const filmAddImageUrl = ref();
 
 async function fetchDirectors() {
     loading.value = true;
@@ -58,28 +60,26 @@ onBeforeMount(async () => {
 
 async function onFilmAdd() {
     const formData = new FormData();
-    const file = filmsPictureRef.value?.files?.[0];
-
-    if (file) {
-        formData.append('picture', file);
-    }
+    formData.append('picture', filmPictureRef.value.files[0]);
 
     formData.set('name', filmToAdd.value.name);
     formData.set('description', filmToAdd.value.description);
     formData.set('rating', filmToAdd.value.rating);
     formData.set('genre', filmToAdd.value.genre);
 
-    const directorsId = [];
     for (const d of filmToAdd.value.directors) {
         formData.append('directors', d);
     }
 
-    const actorsId = [];
     for (const a of filmToAdd.value.actors) {
         formData.append('actors', a);
     }
 
-    await axios.post('/api/films/', formData);
+    await axios.post('/api/films/', formData, {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
     await fetchFilms();
 }
 
@@ -102,6 +102,9 @@ async function onUpdateFilm() {
     await fetchFilms();
 }
 
+async function filmsAddPictureChange() {
+    filmAddImageUrl.value = URL.createObjectURL(filmPictureRef.value.files[0]);
+}
 
 </script>
 <template>
@@ -236,6 +239,7 @@ async function onUpdateFilm() {
         <strong><div>Фильмы</div></strong>
         <div v-for="film in films" :key="film.id" class="show-block">
             {{ film.name }}
+            <div v-show="film.picture"><img :src="film.picture" style="max-height: 60px;"></div>
             <button
                 class="btn btn-success"
                 @click="onFilmEditClick(film)"
@@ -309,13 +313,15 @@ async function onUpdateFilm() {
                     <label for="floatingInput">Актёр</label>
                 </div>
             </div>
-            <!--
+            
             <div class="col-auto">
-                <input type="file" class="form-control" ref="filmsPictureRef">
+                <input type="file" class="form-control" ref="filmPictureRef" @change="filmsAddPictureChange"/>
             </div>
-            -->
 
-
+            <div class="col-auto">
+                <img :src="filmAddImageUrl" style="max-height: 60px;" alt="">
+            </div>
+            
             <div class="col-auto">
             <button class="btn btn-primary">
                 Добавить
@@ -333,7 +339,7 @@ async function onUpdateFilm() {
     border: 1px solid;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto auto auto;
     align-content: center;
     align-items: center;
     gap: 16px;
