@@ -1,4 +1,3 @@
-```vue
 <script setup>
 import { ref, onBeforeMount } from 'vue';
 import Cookies from 'js-cookie';
@@ -10,7 +9,8 @@ const actorToAdd = ref({});
 const actorToEdit = ref({});
 const actorsPictureRef = ref();
 const actorAddImageUrl = ref();
-
+const actorEditImageRef = ref();
+const actorEditImageUrl = ref();
 
 
 async function fetchActors() {
@@ -41,8 +41,6 @@ async function onActorAdd() {
     await fetchActors();
 }
 
-const actorEditPictureRef = ref();
-
 async function onActorEditClick(actor) {
     actorToEdit.value = { ...actor };
 }
@@ -54,16 +52,14 @@ async function onUpdateActor() {
     formData.set('birth_date', actorToEdit.value.birth_date || '');
     formData.set('biography', actorToEdit.value.biography || '');
 
-    const file = actorEditPictureRef.value?.files?.[0];
+    formData.append('picture', actorEditImageRef.value.files[0]);
 
-    if (file) {
-        formData.append('picture', file);
-    }
-
-    await axios.patch(
-        `/api/actors/${actorToEdit.value.id}/`,
-        formData
-    );
+    await axios.put(
+        `/api/actors/${actorToEdit.value.id}/`, formData,  {
+        headers: {
+            'Content-Type': 'multipart/form-data'
+        }
+    });
 
     await fetchActors();
 }
@@ -71,6 +67,11 @@ async function onUpdateActor() {
 async function actorAddPictureChange() {
     actorAddImageUrl.value = URL.createObjectURL(actorsPictureRef.value.files[0]);
 }
+
+async function actorEditPictureChange() {
+    actorEditImageUrl.value = URL.createObjectURL(actorEditImageRef.value.files[0]);
+}
+
 
 async function onRemoveActor(actor) {
     await axios.delete(`/api/actors/${actor.id}/`);
@@ -122,12 +123,11 @@ async function onRemoveActor(actor) {
 
                     <div class="mb-3">
                         <label class="form-label">Новая фотография</label>
-                        <input
-                            type="file"
-                            class="form-control"
-                            ref="actorEditPictureRef"
-                            accept="image/*"
-                        />
+                        <input type="file" class="form-control" ref="actorEditImageRef" @change="actorEditPictureChange"/>
+                    </div>
+
+                    <div class="col-auto">
+                        <img :src="actorEditImageUrl" style="max-height: 60px;" alt="">
                     </div>
                 </div>
 
@@ -174,6 +174,8 @@ async function onRemoveActor(actor) {
                     {{ actor.biography }}
                 </div>
             </div>
+
+            <div v-show="actor.picture"><img :src="actor.picture" style="max-height: 60px;"></div>
 
             <button
                 class="btn btn-success"
@@ -230,7 +232,11 @@ async function onRemoveActor(actor) {
                 </div>
 
                 <div class="col-auto">
-                    <input :src="actorAddImageUrl" type="file" class="form-control" ref="actorsPictureRef">
+                    <input :src="actorAddImageUrl" type="file" class="form-control" ref="actorsPictureRef" @change="actorAddPictureChange">
+                </div>
+
+                <div class="col-auto">
+                    <img :src="actorAddImageUrl" style="max-height: 60px;" alt="">
                 </div>
 
 
@@ -251,10 +257,9 @@ async function onRemoveActor(actor) {
     border: 1px solid;
     border-radius: 8px;
     display: grid;
-    grid-template-columns: 1fr auto auto;
+    grid-template-columns: 1fr auto auto auto;
     align-content: center;
     align-items: center;
     gap: 16px;
 }
 </style>
-```
