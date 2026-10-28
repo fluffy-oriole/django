@@ -14,6 +14,7 @@ const filmPictureRef = ref();
 const filmEditPictureRef = ref();
 const filmAddImageUrl = ref();
 const filmEditImageUrl = ref();
+const showPictureModal = ref();
 
 async function fetchDirectors() {
     loading.value = true;
@@ -135,6 +136,10 @@ async function filmEditPictureChange() {
     filmEditImageUrl.value = URL.createObjectURL(filmEditPictureRef.value.files[0]);
 }
 
+
+async function showPictureModalChange(picture) {
+    showPictureModal.value = picture
+}
 </script>
 <template>
     <div class="modal fade" id="editFilmModal" tabindex="-1">
@@ -144,12 +149,7 @@ async function filmEditPictureChange() {
                     <h1 class="modal-title fs-5" id="exampleModalLabel">
                         редактировать фильм
                     </h1>
-                    <button
-                        type="button"
-                        class="btn-close"
-                        data-bs-dismiss="modal"
-                        aria-label="Close"
-                    ></button>
+                    <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
                 <div class="modal-body">
                     <div class="row">
@@ -202,16 +202,8 @@ async function filmEditPictureChange() {
                     <div class="row mt-3">
                         <div class="col">
                             <div class="form-floating">
-                                <select
-                                    class="form-select"
-                                    v-model="filmToEdit.directors"
-                                    multiple
-                                >
-                                    <option
-                                        :value="director.id"
-                                        v-for="director in directors"
-                                        :key="director.id"
-                                    >
+                                <select class="form-select" v-model="filmToEdit.directors" multiple>
+                                    <option :value="director.id" v-for="director in directors" :key="director.id">
                                         {{ director.name }}
                                     </option>
                                 </select>
@@ -222,16 +214,8 @@ async function filmEditPictureChange() {
                     <div class="row mt-3">
                         <div class="col">
                             <div class="form-floating">
-                                <select
-                                    class="form-select"
-                                    v-model="filmToEdit.actors"
-                                    multiple
-                                >
-                                    <option
-                                        :value="actor.id"
-                                        v-for="actor in actors"
-                                        :key="actor.id"
-                                    >
+                                <select class="form-select" v-model="filmToEdit.actors" multiple>
+                                    <option :value="actor.id" v-for="actor in actors" :key="actor.id">
                                         {{ actor.name }}
                                     </option>
                                 </select>
@@ -272,19 +256,31 @@ async function filmEditPictureChange() {
     </div>
 
 
+    <div class="modal" tabindex="-1" id="showPictureModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center">
+                <img :src="showPictureModal" style="max-height: 700px; max-width: 900px;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
+
     <div class="container">
         <div v-if="loading">Загрузка...</div>
 
         <strong><div>Фильмы</div></strong>
         <div v-for="film in films" :key="film.id" class="show-block">
             {{ film.name }}
-            <div v-show="film.picture"><img :src="film.picture" style="max-height: 60px;"></div>
-            <button
-                class="btn btn-success"
-                @click="onFilmEditClick(film)"
-                data-bs-toggle="modal"
-                data-bs-target="#editFilmModal"
-            >
+            <div v-show="film.picture" data-bs-toggle="modal" data-bs-target="#showPictureModal" @click="showPictureModalChange(film.picture)"><img :src="film.picture" style="max-height: 60px;"></div>
+            <button class="btn btn-success" @click="onFilmEditClick(film)" data-bs-toggle="modal" data-bs-target="#editFilmModal">
                 <i class="bi bi-pen-fill"></i>
             </button>
             <button class="btn btn-danger" @click="onRemoveFilm(film)">
