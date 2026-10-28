@@ -11,6 +11,7 @@ const actorsPictureRef = ref();
 const actorAddImageUrl = ref();
 const actorEditImageRef = ref();
 const actorEditImageUrl = ref();
+const showPictureModal = ref();
 
 
 async function fetchActors() {
@@ -77,6 +78,12 @@ async function onRemoveActor(actor) {
     await axios.delete(`/api/actors/${actor.id}/`);
     await fetchActors();
 }
+
+
+async function showPictureModalChange(picture) {
+    showPictureModal.value = picture;
+}
+
 </script>
 
 <template>
@@ -153,6 +160,22 @@ async function onRemoveActor(actor) {
         </div>
     </div>
 
+    <div class="modal" tabindex="-1" id="showPictureModal">
+        <div class="modal-dialog modal-xl">
+            <div class="modal-content">
+            <div class="modal-header">
+                <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Закрыть"></button>
+            </div>
+            <div class="modal-body d-flex justify-content-center">
+                <img :src="showPictureModal" style="max-height: 700px; max-width: 900px;">
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Закрыть</button>
+            </div>
+            </div>
+        </div>
+    </div>
+
     <div class="container">
         <div v-if="loading">Загрузка...</div>
 
@@ -175,7 +198,7 @@ async function onRemoveActor(actor) {
                 </div>
             </div>
 
-            <div v-show="actor.picture"><img :src="actor.picture" style="max-height: 60px;"></div>
+            <div v-show="actor.picture" @click="showPictureModalChange(actor.picture)"  data-bs-toggle="modal" data-bs-target="#showPictureModal"><img :src="actor.picture" style="max-height: 60px;"></div>
 
             <button
                 class="btn btn-success"
