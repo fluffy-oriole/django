@@ -6,8 +6,7 @@ from faker import Faker
 from django.contrib.auth.models import User
 import re
 from transliterate import translit
-
-from films.models import Film, Actor, Director, Genre, Review, Collection
+from films.models import Film, Actor, Director, Genre, Profile, Review, Collection
 
 
 class Command(BaseCommand):
@@ -62,31 +61,38 @@ class Command(BaseCommand):
             user.profile.role = 2
             user.profile.save()
 
+        genres = list(Genre.objects.all())
+        actors = list(Actor.objects.all())
+        directors = list(Director.objects.all())
+
         for _ in tqdm(list(range(1000))):
-            Film.objects.create(
+            film = Film.objects.create(
                 name = fake.sentence(nb_words=3),
                 description = fake.paragraph(nb_sentences=5),
                 rating = fake.random_int(min=1, max=10),
-                genre=choice(list(Genre.objects.all())),
-                actors=sample(list(Actor.objects.all()), k=3),
-                directors=sample(list(Director.objects.all()), k=2)
+                genre=choice(genres),
             )
 
-            for _ in tqdm(list(range(1000))):
-                review = Review.objects.create(
-                    review_text=fake.paragraph(nb_sentences=5),
-                    rate=fake.random_int(min=1, max=10)
-                )
-                review.film = choice(list(Film.objects.all()))
-                review.author = choice(list(User.objects.all()))
-                review.save()
+            film.actors.set(sample(actors, k=3))
+            film.directors.set(sample(directors, k=2))
+            film.save()
+
+        films = list(Film.objects.all())
+        profiles = list(Profile.objects.all())
+
+        for _ in tqdm(list(range(1000))):
+            review = Review.objects.create(
+                review_text=fake.paragraph(nb_sentences=5),
+                rate=fake.random_int(min=1, max=10)
+            )
+            review.film = choice(films)
+            review.author = choice(profiles)
+            review.save()
 
 
-                collection = Collection.objects.create(
-                    name=fake.sentence(nb_words=3),
-                    price=fake.random_int(min=100, max=1000)
-                )
-                collection.films.set(sample(list(Film.objects.all()), k=5))
-                collection.save()
-
-                
+            collection = Collection.objects.create(
+                name=fake.sentence(nb_words=3),
+                price=fake.random_int(min=100, max=1000)
+            )
+            collection.films.set(sample(films, k=5))
+            collection.save()
