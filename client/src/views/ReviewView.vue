@@ -8,6 +8,7 @@ const films = ref([]);
 const loading = ref(false);
 const reviewToAdd = ref({});
 const reviewToEdit = ref({})
+const profiles = ref([]);
 
 async function fetchReviews() {
     loading.value = true;
@@ -24,10 +25,16 @@ async function fetchFilms() {
     films.value = r.data;
 }
 
+async function fetchUsers() {
+    const r = await axios.get('/api/profile/');
+    profiles.value = r.data;
+}
+
 async function onLoadClick() {
     await Promise.all([
         fetchReviews(),
-        fetchFilms()
+        fetchFilms(),
+        fetchUsers()
     ]);
 }
 
@@ -52,6 +59,7 @@ async function onRemoveReview(review) {
 
 async function onReviewEditClick(review) {
     reviewToEdit.value = { ...review };
+    console.log("Редактируем:", reviewToEdit.value);
 }
 
 async function onUpdateReview() {
@@ -105,11 +113,11 @@ async function onUpdateReview() {
                     <div class="row mt-3">
                         <div class="col">
                             <div class="form-floating">
-                                <input
-                                    type="text"
-                                    class="form-control"
-                                    v-model="reviewToEdit.author"
-                                />
+                                <select class="form-select" v-model="reviewToEdit.author">
+                                    <option :value="profile.id" v-for="profile in profiles" :key="profile.id">
+                                        {{ profile.id }}
+                                    </option>
+                                </select>
                                 <label>Автор</label>
                             </div>
                         </div>
@@ -220,12 +228,11 @@ async function onUpdateReview() {
 
                 <div class="col">
                     <div class="form-floating">
-                        <input
-                            type="text"
-                            class="form-control"
-                            v-model="reviewToAdd.author"
-                            required
-                        />
+                        <select class="form-select" v-model="reviewToAdd.author" required>
+                            <option :value="profile.id" v-for="profile in profiles" :key="profile.id">
+                                {{ profile.id }}
+                            </option>
+                        </select>
                         <label>Автор</label>
                     </div>
                 </div>

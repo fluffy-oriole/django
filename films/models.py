@@ -50,7 +50,7 @@ class Genre(models.Model):
 class Review(models.Model):
     film = models.ForeignKey("Film", on_delete=models.CASCADE, null=True)
     review_text = models.TextField("Текст рецензии")
-    author = models.TextField("Автор")
+    author = models.ForeignKey("Profile", on_delete=models.CASCADE, null=True)
     rate = models.IntegerField("Оценка")
 
     class Meta:
