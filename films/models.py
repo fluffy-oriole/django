@@ -31,6 +31,7 @@ class Film(models.Model):
     directors = models.ManyToManyField("Director", related_name="films")
     genre = models.ForeignKey("Genre", on_delete=models.CASCADE, null=True)
     actors = models.ManyToManyField("Actor", related_name="films")
+    user = models.ForeignKey("auth.User", verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
 
     picture = models.ImageField("Изображение", null=True, upload_to="films")
 
@@ -53,6 +54,7 @@ class FilmImages(models.Model):
 
 class Genre(models.Model):
     name = models.TextField("Название")
+    user = models.ForeignKey("auth.User", verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
 
     def __str__(self) -> str:
         return self.name
@@ -66,6 +68,7 @@ class Review(models.Model):
     review_text = models.TextField("Текст рецензии")
     author = models.ForeignKey("Profile", on_delete=models.CASCADE, null=True)
     rate = models.IntegerField("Оценка")
+    user = models.ForeignKey("auth.User", verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
 
     class Meta:
         verbose_name = "Рецензия"
@@ -75,6 +78,7 @@ class Director(models.Model):
     name = models.TextField("ФИО")
     birth_date = models.DateField("Дата рождения", null=True, blank=True)
     biography = models.TextField("Биография", null=True, blank=True)
+    user = models.ForeignKey("auth.User", verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
 
     def __str__(self) -> str:
             return self.name
@@ -87,6 +91,7 @@ class Actor(models.Model):
     name = models.TextField("ФИО")
     birth_date = models.DateField("Дата рождения", null=True, blank=True)
     biography = models.TextField("Биография", null=True, blank=True)
+    user = models.ForeignKey("auth.User", verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
 
     picture = models.ImageField("Изображение", null=True, upload_to="actors")
     
@@ -103,6 +108,7 @@ class Collection(models.Model):
     name = models.TextField("Название")
     films = models.ManyToManyField("Film", related_name="collections")
     price = models.FloatField("Цена")
+    user = models.ForeignKey("auth.User", verbose_name="Пользователь", on_delete=models.CASCADE, null=True)
 
     def __str__(self) -> str:
         return self.name

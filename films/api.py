@@ -20,6 +20,13 @@ class FilmsViewset(
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=self.request.user)
+
 class GenresViewset(
                 mixins.ListModelMixin,
                 mixins.CreateModelMixin,
@@ -29,6 +36,13 @@ class GenresViewset(
                 GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=self.request.user)
 
 class ActorsViewset(
                 mixins.ListModelMixin,
@@ -40,6 +54,13 @@ class ActorsViewset(
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=self.request.user)
+
 class DirectorsViewset(
                 mixins.ListModelMixin,
                 mixins.CreateModelMixin,
@@ -49,6 +70,13 @@ class DirectorsViewset(
                 GenericViewSet):
     queryset = Director.objects.all()
     serializer_class = DirectorSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=self.request.user)
 
 class ReviewsViewset(
                 mixins.ListModelMixin,
@@ -60,6 +88,13 @@ class ReviewsViewset(
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
 
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=self.request.user)
+
 class CollectionsViewset(
                 mixins.ListModelMixin,
                 mixins.CreateModelMixin,
@@ -69,6 +104,13 @@ class CollectionsViewset(
                 GenericViewSet):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
+
+    def get_queryset(self):
+        qs = super().get_queryset()
+        if self.request.user.is_superuser:
+            return qs
+        else:
+            return qs.filter(user=self.request.user)
 
 class ProfileViewSet(mixins.ListModelMixin,
                 mixins.CreateModelMixin,
