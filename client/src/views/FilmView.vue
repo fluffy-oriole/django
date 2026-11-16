@@ -15,6 +15,8 @@ const filmEditPictureRef = ref();
 const filmAddImageUrl = ref();
 const filmEditImageUrl = ref();
 const showPictureModal = ref();
+const filmImages = ref([]);
+const filmImagesRef = ref();
 
 async function fetchDirectors() {
     loading.value = true;
@@ -33,7 +35,6 @@ async function fetchActors() {
 async function fetchGenres() {
     loading.value = true;
     const r = await axios.get('/api/genres/');
-    console.log(r.data);
     genres.value = r.data;
     loading.value = false;
 }
@@ -41,8 +42,8 @@ async function fetchGenres() {
 async function fetchFilms() {
     loading.value = true;
     const r = await axios.get("/api/films/");
-    console.log(r.data);
     films.value = r.data;
+    console.log(r.data);
     loading.value = false;
 }
 
@@ -78,11 +79,23 @@ async function onFilmAdd() {
         formData.append('actors', a);
     }
 
-    await axios.post('/api/films/', formData, {
+    const film = await axios.post('/api/films/', formData, {
         headers: {
             'Content-Type': 'multipart/form-data'
         }
     });
+
+    for (const file of filmImages.value) {
+        const imageFormData = new FormData();
+        imageFormData.append('film', film.data.id);
+        imageFormData.append('image', file);
+
+        await axios.post('/api/film-images/', imageFormData, {
+            headers: { 'Content-Type': 'multipart/form-data' }
+        });
+    }
+
+    
     await fetchFilms();
 }
 
@@ -136,10 +149,15 @@ async function filmEditPictureChange() {
     filmEditImageUrl.value = URL.createObjectURL(filmEditPictureRef.value.files[0]);
 }
 
-
 async function showPictureModalChange(picture) {
     showPictureModal.value = picture
 }
+
+async function filmImagesChange() {
+    filmImages.value = Array.from(filmImagesRef.value.files);
+    console.log(filmImages.value);
+}
+
 </script>
 <template>
     <div class="modal fade" id="editFilmModal" tabindex="-1">
@@ -276,18 +294,6 @@ async function showPictureModalChange(picture) {
     <div class="container">
         <div v-if="loading">Загрузка...</div>
 
-        <strong><div>Фильмы</div></strong>
-        <div v-for="film in films" :key="film.id" class="show-block">
-            {{ film.name }}
-            <div v-show="film.picture" data-bs-toggle="modal" data-bs-target="#showPictureModal" @click="showPictureModalChange(film.picture)"><img :src="film.picture" style="max-height: 60px;"></div>
-            <button class="btn btn-success" @click="onFilmEditClick(film)" data-bs-toggle="modal" data-bs-target="#editFilmModal">
-                <i class="bi bi-pen-fill"></i>
-            </button>
-            <button class="btn btn-danger" @click="onRemoveFilm(film)">
-                <i class="bi bi-x"></i>
-            </button>
-        </div>
-
         <strong><div>Добавить фильм</div></strong>
         <form @submit.prevent.stop="onFilmAdd">
         <div class="row">
@@ -354,6 +360,10 @@ async function showPictureModalChange(picture) {
             </div>
 
             <div class="col-auto">
+                <input type="file" class="form-control" ref="filmImagesRef" @change="filmImagesChange" multiple/>
+            </div>
+            
+            <div class="col-auto">
                 <img :src="filmAddImageUrl" style="max-height: 60px;" alt="">
             </div>
             
@@ -364,6 +374,49 @@ async function showPictureModalChange(picture) {
             </div>
         </div>
         </form>
+        <strong><div>Фильмы</div></strong>
+        <div v-for="film in films" :key="film.id" class="container">
+            <div class="row show-block">
+                {{ film.name }}
+                <div v-show="film.picture" data-bs-toggle="modal" data-bs-target="#showPictureModal" @click="showPictureModalChange(film.picture)">
+                    <img :src="film.picture" style="max-height: 60px;">
+                </div>
+                <button class="btn btn-success" @click="onFilmEditClick(film)" data-bs-toggle="modal" data-bs-target="#editFilmModal">
+                    <i class="bi bi-pen-fill"></i>
+                </button>
+                
+                <button class="btn btn-danger" @click="onRemoveFilm(film)">
+                    <i class="bi bi-x"></i>
+                </button>
+            </div>
+            <div class="row">
+                <div id="ZZZZZ" class="carousel slide">
+                    <div class="d-flex justify-content-between align-items-center">
+                        <h5 class="mb-0">Top controls</h5>
+                        <div>
+                        <button class="btn-icon btn-sm" type="button" data-bs-target="#carouselStacked" data-bs-slide="prev">
+                            <span aria-hidden="true"><i class="bi-chevron-left"></i></span>
+                            <span class="visually-hidden">Previous</span>
+                        </button>
+                        <button class="btn-icon btn-sm" type="button" data-bs-target="#carouselStacked" data-bs-slide="next">
+                            <span aria-hidden="true"><i class="bi-chevron-right"></i></span>
+                            <span class="visually-hidden">Next</span>
+                        </button>
+                        </div>
+                    </div>
+                    <div class="carousel-inner">
+                        <div class="carousel-item active" >
+                            <img class="d-block" :src="film.images?.[0]?.image" :key="film.images?.[0]?.id" style="max-height: 300px;">
+                        </div>
+                        
+                        <div data-bs-toggle="modal"  class="carousel-item" v-for="img in film.images.slice(1)" :key="img.id">
+                            <img class="d-block" :src="img.image" style="max-height: 300px;">
+                        </div>
+                        
+                    </div>
+                </div>
+            </div>
+        </div>
     </div>
 </template>
 
@@ -373,7 +426,6 @@ async function showPictureModalChange(picture) {
     margin: 0.5rem 0;
     border: 1px solid;
     border-radius: 8px;
-    display: grid;
     grid-template-columns: 1fr auto auto auto;
     align-content: center;
     align-items: center;

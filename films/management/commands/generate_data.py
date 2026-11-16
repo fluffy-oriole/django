@@ -48,7 +48,7 @@ class Command(BaseCommand):
             
             fio = fake.name()
             fio_translited = translit(fio, 'ru', reversed=True).lower()
-            fio_translited = re.sub("['-]", "", fio_translited)
+            fio_translited = re.sub("['-.]", "", fio_translited)
             fio_translited = fio_translited.replace(" ", "_")
             print(fio_translited)
 

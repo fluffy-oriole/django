@@ -1,8 +1,8 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
 from rest_framework import mixins
-from films.models import Collection, Director, Film, Genre, Review, Actor, Profile
-from films.serializers import DirectorSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer, CollectionSerializer, ProfileSerializer
+from films.models import Collection, Director, Film, FilmImages, Genre, Review, Actor, Profile
+from films.serializers import DirectorSerializer, FilmImagesSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer, CollectionSerializer, ProfileSerializer
 from django.contrib.auth.models import User
 from django.contrib.auth import logout as django_logout
 from django.contrib.auth import login as django_login
@@ -114,3 +114,14 @@ class ProfileViewSet(mixins.ListModelMixin,
             django_login(self.request, user)
 
         return Response({'success': success, 'status': status_code})
+
+
+class FilmsImagesViewset(
+                mixins.ListModelMixin,
+                mixins.CreateModelMixin,
+                mixins.UpdateModelMixin,
+                mixins.RetrieveModelMixin,
+                mixins.DestroyModelMixin,
+                GenericViewSet):
+    queryset = FilmImages.objects.all()
+    serializer_class = FilmImagesSerializer

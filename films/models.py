@@ -13,6 +13,10 @@ class Profile(models.Model):
     user = models.OneToOneField('auth.User', on_delete=models.CASCADE, null=True, blank=True)
     role = models.IntegerField("Роль", choices=Role, default=Role.undefined)
 
+    class Meta:
+            verbose_name = "Профиль пользователя"
+            verbose_name_plural = "Профили пользователей"
+
 @receiver(post_save, sender=User)
 def on_user_create(sender, instance, created, *args, **kwargs):
     if created:
@@ -36,6 +40,16 @@ class Film(models.Model):
 
     def __str__(self) -> str:
         return self.name
+
+
+class FilmImages(models.Model):
+    film = models.ForeignKey("Film", on_delete=models.CASCADE, null=True, related_name="images")
+    image = models.ImageField("Изображение", null=True, upload_to="films")
+
+    class Meta:
+        verbose_name = "Кадр фильма"
+        verbose_name_plural = "Кадры фильмов"
+
 
 class Genre(models.Model):
     name = models.TextField("Название")
