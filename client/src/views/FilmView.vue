@@ -296,7 +296,7 @@ async function filmImagesChange() {
 
         <strong><div>Добавить фильм</div></strong>
         <form @submit.prevent.stop="onFilmAdd">
-        <div class="row">
+        <div class="row mb-2">
             <div class="col">
                 <div class="form-floating">
                     <input
@@ -330,6 +330,8 @@ async function filmImagesChange() {
                     <label for="floatingInput">Рейтинг</label>
                 </div>
             </div>
+        </div>
+        <div class="row mb-2">
             <div class="col-auto">
                 <div class="form-floating">
                     <select class="form-select" v-model="filmToAdd.genre" required>
@@ -354,7 +356,8 @@ async function filmImagesChange() {
                     <label for="floatingInput">Актёр</label>
                 </div>
             </div>
-            
+        </div>
+        <div class="row mb-2">
             <div class="col-auto">
                 <input type="file" class="form-control" ref="filmPictureRef" @change="filmsAddPictureChange"/>
             </div>
@@ -376,7 +379,7 @@ async function filmImagesChange() {
         </form>
         <strong><div>Фильмы</div></strong>
         <div v-for="film in films" :key="film.id" class="container">
-            <div class="row show-block">
+            <div class="show-block">
                 {{ film.name }}
                 <div v-show="film.picture" data-bs-toggle="modal" data-bs-target="#showPictureModal" @click="showPictureModalChange(film.picture)">
                     <img :src="film.picture" style="max-height: 60px;">
@@ -389,7 +392,7 @@ async function filmImagesChange() {
                     <i class="bi bi-x"></i>
                 </button>
             </div>
-            <div class="row">
+            <div>
                 <div id="ZZZZZ" class="carousel slide">
                     <div class="d-flex justify-content-between align-items-center">
                         <h5 class="mb-0">Top controls</h5>
@@ -422,13 +425,13 @@ async function filmImagesChange() {
 
 <style scoped>
 .show-block {
+    display: grid;
+    grid-template-columns: 1fr auto auto auto;
+    align-items: center;
+    gap: 16px;
     padding: 0.5rem;
     margin: 0.5rem 0;
     border: 1px solid;
     border-radius: 8px;
-    grid-template-columns: 1fr auto auto auto;
-    align-content: center;
-    align-items: center;
-    gap: 16px;
 }
 </style>
