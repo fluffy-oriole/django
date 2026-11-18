@@ -7,6 +7,10 @@ const directors = ref([]);
 const loading = ref(false);
 const directorToAdd = ref({});
 const directorToEdit = ref({});
+const countOfDirectors = ref(0);
+const avgBirthYearOfDirectors = ref(0);
+const maxBirthYearOfDirectors = ref(0);
+const minBirthYearOfDirectors = ref(0);
 
 async function fetchDirectors() {
     loading.value = true;
@@ -18,9 +22,18 @@ async function fetchDirectors() {
     }
 }
 
+async function fetchStats() {
+    const r = await axios.get('/api/directors/stats');
+    countOfDirectors.value = r.data.count;
+    avgBirthYearOfDirectors.value = r.data.avg;
+    maxBirthYearOfDirectors.value = r.data.max;
+    minBirthYearOfDirectors.value = r.data.min;
+}
+
 onBeforeMount(() => {
     axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
     fetchDirectors();
+    fetchStats();
 });
 
 async function onDirectorAdd() {
@@ -30,11 +43,13 @@ async function onDirectorAdd() {
 
     directorToAdd.value = {};
     await fetchDirectors();
+    await fetchStats();
 }
 
 async function onRemoveDirector(director) {
     await axios.delete(`/api/directors/${director.id}/`);
     await fetchDirectors();
+    await fetchStats();
 }
 
 async function onDirectorEditClick(director) {
@@ -46,6 +61,7 @@ async function onUpdateDirector() {
     ...directorToEdit.value,
     });
     await fetchDirectors();
+    await fetchStats();
 }
 </script>
 
@@ -124,6 +140,14 @@ async function onUpdateDirector() {
 
     <div class="container">
         <div v-if="loading">Загрузка...</div>
+
+        <div>
+            <div><strong>Статистика</strong></div>
+            <div>Количество режиссёров: {{ countOfDirectors }}</div>
+            <div>Средний год рождения: {{ avgBirthYearOfDirectors }}</div>
+            <div>Максимальный год рождения: {{ maxBirthYearOfDirectors }}</div>
+            <div>Минимальный год рождения: {{ minBirthYearOfDirectors }}</div>
+        </div>
 
         <strong><div>Режиссёры</div></strong>
 

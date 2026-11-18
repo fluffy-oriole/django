@@ -12,6 +12,10 @@ const actorAddImageUrl = ref();
 const actorEditImageRef = ref();
 const actorEditImageUrl = ref();
 const showPictureModal = ref();
+const countOfActors = ref(0);
+const avgBirthYearOfActors = ref(0);
+const maxBirthYearOfActors = ref(0);
+const minBirthYearOfActors = ref(0);
 
 
 async function fetchActors() {
@@ -21,9 +25,18 @@ async function fetchActors() {
     loading.value = false;
 }
 
+async function fetchStats() {
+    const r = await axios.get('/api/actors/stats');
+    countOfActors.value = r.data.count;
+    avgBirthYearOfActors.value = r.data.avg;
+    maxBirthYearOfActors.value = r.data.max;
+    minBirthYearOfActors.value = r.data.min;
+}
+
 onBeforeMount(() => {
     axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
     fetchActors();
+    fetchStats();
 });
 
 async function onActorAdd() {
@@ -40,6 +53,7 @@ async function onActorAdd() {
         },
     });
     await fetchActors();
+    await fetchStats();
 }
 
 async function onActorEditClick(actor) {
@@ -63,6 +77,7 @@ async function onUpdateActor() {
     });
 
     await fetchActors();
+    await fetchStats();
 }
 
 async function actorAddPictureChange() {
@@ -77,6 +92,7 @@ async function actorEditPictureChange() {
 async function onRemoveActor(actor) {
     await axios.delete(`/api/actors/${actor.id}/`);
     await fetchActors();
+    await fetchStats();
 }
 
 
@@ -178,6 +194,14 @@ async function showPictureModalChange(picture) {
 
     <div class="container">
         <div v-if="loading">Загрузка...</div>
+
+        <div>
+            <div><strong>Статистика</strong></div>
+            <div>Количество актёров: {{ countOfActors }}</div>
+            <div>Средний год рождения: {{ avgBirthYearOfActors }}</div>
+            <div>Максимальный год рождения: {{ maxBirthYearOfActors }}</div>
+            <div>Минимальный год рождения: {{ minBirthYearOfActors }}</div>
+        </div>
 
         <strong><div>Актёры</div></strong>
 

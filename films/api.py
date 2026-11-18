@@ -10,6 +10,7 @@ from django.contrib.auth import login as django_login
 from django.contrib.auth import authenticate
 from rest_framework.decorators import action
 from django.db.models import Count, Avg, Min, Max
+from django.db.models.functions import ExtractYear
 
 
 class FilmsViewset(
@@ -71,6 +72,19 @@ class GenresViewset(
         else:
             return qs.filter(user=self.request.user)
 
+    class StatsSerializer(serializers.Serializer):
+            count = serializers.IntegerField()
+            
+    
+    @action(detail=False, url_path='stats', methods=['GET'])
+    def get_stats(self, *args, **kwargs):
+        stats = Genre.objects.aggregate(
+            count=Count('id'),
+        )
+
+        serealizer = self.StatsSerializer(instance=stats)
+        return Response(data=serealizer.data)
+
 class ActorsViewset(
                 mixins.ListModelMixin,
                 mixins.CreateModelMixin,
@@ -87,6 +101,25 @@ class ActorsViewset(
             return qs
         else:
             return qs.filter(user=self.request.user)
+
+
+    class StatsSerializer(serializers.Serializer):
+        count = serializers.IntegerField()
+        avg = serializers.FloatField()
+        max = serializers.IntegerField()
+        min = serializers.IntegerField()
+
+    @action(detail=False, url_path='stats', methods=['GET'])
+    def get_stats(self, *args, **kwargs):
+        stats = Actor.objects.aggregate(
+            count=Count('id'),
+            avg=Avg(ExtractYear('birth_date')),
+            max=Max(ExtractYear('birth_date')),
+            min=Min(ExtractYear('birth_date')),
+        )
+
+        serializer = self.StatsSerializer(instance=stats)
+        return Response(data=serializer.data)
 
 class DirectorsViewset(
                 mixins.ListModelMixin,
@@ -105,6 +138,24 @@ class DirectorsViewset(
         else:
             return qs.filter(user=self.request.user)
 
+    class StatsSerializer(serializers.Serializer):
+        count = serializers.IntegerField()
+        avg = serializers.FloatField()
+        max = serializers.IntegerField()
+        min = serializers.IntegerField()
+
+    @action(detail=False, url_path='stats', methods=['GET'])
+    def get_stats(self, *args, **kwargs):
+        stats = Director.objects.aggregate(
+            count=Count('id'),
+            avg=Avg(ExtractYear('birth_date')),
+            max=Max(ExtractYear('birth_date')),
+            min=Min(ExtractYear('birth_date')),
+        )
+
+        serializer = self.StatsSerializer(instance=stats)
+        return Response(data=serializer.data)
+
 class ReviewsViewset(
                 mixins.ListModelMixin,
                 mixins.CreateModelMixin,
@@ -122,6 +173,24 @@ class ReviewsViewset(
         else:
             return qs.filter(user=self.request.user)
 
+    class StatsSerializer(serializers.Serializer):
+        count = serializers.IntegerField()
+        avg = serializers.FloatField()
+        max = serializers.IntegerField()
+        min = serializers.IntegerField()
+
+    @action(detail=False, url_path='stats', methods=['GET'])
+    def get_stats(self, *args, **kwargs):
+        stats = Review.objects.aggregate(
+            count=Count('id'),
+            avg=Avg('rate'),
+            max=Max('rate'),
+            min=Min('rate'),
+        )
+
+        serializer = self.StatsSerializer(instance=stats)
+        return Response(data=serializer.data)
+
 class CollectionsViewset(
                 mixins.ListModelMixin,
                 mixins.CreateModelMixin,
@@ -138,6 +207,24 @@ class CollectionsViewset(
             return qs
         else:
             return qs.filter(user=self.request.user)
+
+    class StatsSerializer(serializers.Serializer):
+        count = serializers.IntegerField()
+        avg = serializers.FloatField()
+        max = serializers.FloatField()
+        min = serializers.FloatField()
+
+    @action(detail=False, url_path='stats', methods=['GET'])
+    def get_stats(self, *args, **kwargs):
+        stats = Collection.objects.aggregate(
+            count=Count('id'),
+            avg=Avg('price'),
+            max=Max('price'),
+            min=Min('price'),
+        )
+
+        serializer = self.StatsSerializer(instance=stats)
+        return Response(data=serializer.data)
 
 class ProfileViewSet(mixins.ListModelMixin,
                 mixins.CreateModelMixin,

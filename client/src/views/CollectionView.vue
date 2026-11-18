@@ -10,6 +10,11 @@ const loading = ref(false);
 const collectionToAdd = ref({});
 const collectionToEdit = ref({});
 
+const countOfCollections = ref(0);
+const avgPriceOfCollections = ref(0);
+const maxPriceOfCollections = ref(0);
+const minPriceOfCollections = ref(0);
+
 async function fetchCollections() {
     loading.value = true;
     try {
@@ -25,10 +30,19 @@ async function fetchFilms() {
     films.value = r.data;
 }
 
+async function fetchStats() {
+    const r = await axios.get('/api/collections/stats');
+    countOfCollections.value = r.data.count;
+    avgPriceOfCollections.value = r.data.avg;
+    maxPriceOfCollections.value = r.data.max;
+    minPriceOfCollections.value = r.data.min;
+}
+
 async function onLoadClick() {
     await Promise.all([
         fetchCollections(),
-        fetchFilms()
+        fetchFilms(),
+        fetchStats()
     ]);
 }
 
@@ -44,11 +58,13 @@ async function onCollectionAdd() {
 
     collectionToAdd.value = {};
     await fetchCollections();
+    await fetchStats();
 }
 
 async function onRemoveCollection(collection) {
     await axios.delete(`/api/collections/${collection.id}/`);
     await fetchCollections();
+    await fetchStats();
 }
 
 async function onCollectionEditClick(collection) {
@@ -69,6 +85,7 @@ async function onUpdateCollection() {
     );
 
     await fetchCollections();
+    await fetchStats();
 }
 
 </script>
@@ -157,6 +174,14 @@ async function onUpdateCollection() {
 
     <div class="container">
         <div v-if="loading">Загрузка...</div>
+
+        <div>
+            <div><strong>Статистика</strong></div>
+            <div>Количество коллекций: {{ countOfCollections }}</div>
+            <div>Средняя цена: {{ avgPriceOfCollections }}</div>
+            <div>Максимальная цена: {{ maxPriceOfCollections }}</div>
+            <div>Минимальная цена: {{ minPriceOfCollections }}</div>
+        </div>
 
         <strong><div>Коллекции</div></strong>
 

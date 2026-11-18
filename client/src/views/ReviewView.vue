@@ -10,6 +10,11 @@ const reviewToAdd = ref({});
 const reviewToEdit = ref({})
 const profiles = ref([]);
 
+const countOfReviews = ref(0);
+const avgRateOfReviews = ref(0);
+const maxRateOfReviews = ref(0);
+const minRateOfReviews = ref(0);
+
 async function fetchReviews() {
     loading.value = true;
     try {
@@ -30,11 +35,20 @@ async function fetchUsers() {
     profiles.value = r.data;
 }
 
+async function fetchStats() {
+    const r = await axios.get('/api/reviews/stats');
+    countOfReviews.value = r.data.count;
+    avgRateOfReviews.value = r.data.avg;
+    maxRateOfReviews.value = r.data.max;
+    minRateOfReviews.value = r.data.min;
+}
+
 async function onLoadClick() {
     await Promise.all([
         fetchReviews(),
         fetchFilms(),
-        fetchUsers()
+        fetchUsers(),
+        fetchStats()
     ]);
 }
 
@@ -50,11 +64,13 @@ async function onReviewAdd() {
 
     reviewToAdd.value = {};
     await fetchReviews();
+    await fetchStats();
 }
 
 async function onRemoveReview(review) {
     await axios.delete(`/api/reviews/${review.id}/`);
     await fetchReviews();
+    await fetchStats();
 }
 
 async function onReviewEditClick(review) {
@@ -67,6 +83,7 @@ async function onUpdateReview() {
     ...reviewToEdit.value,
     });
     await fetchReviews();
+    await fetchStats();
 }
 
 </script>
@@ -158,6 +175,14 @@ async function onUpdateReview() {
 
     <div class="container">
         <div v-if="loading">Загрузка...</div>
+
+        <div>
+            <div><strong>Статистика</strong></div>
+            <div>Количество рецензий: {{ countOfReviews }}</div>
+            <div>Средняя оценка: {{ avgRateOfReviews }}</div>
+            <div>Максимальная оценка: {{ maxRateOfReviews }}</div>
+            <div>Минимальная оценка: {{ minRateOfReviews }}</div>
+        </div>
 
         <strong><div>Рецензии</div></strong>
 

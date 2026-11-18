@@ -8,6 +8,15 @@ const loading = ref(false);
 const genreToAdd = ref({});
 const genreToEdit = ref({});
 
+const countOfGenres = ref(0);
+
+async function fetchStats() {
+    const r = await axios.get('/api/genres/stats');
+    console.log(r.data.count);
+    countOfGenres.value = r.data.count;
+}
+
+
 async function fetchGenres() {
     loading.value = true;
     const r = await axios.get('/api/genres/');
@@ -19,6 +28,7 @@ async function fetchGenres() {
 onBeforeMount(() => {
     axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
     fetchGenres();
+    fetchStats();
 });
 
 async function onGenreAdd() {
@@ -52,6 +62,35 @@ async function onUpdateGenre() {
     <div class="container">
         <div v-if="loading">Загрузка...</div>
 
+        <strong><div>Добавить жанр</div></strong>
+
+        <form @submit.prevent.stop="onGenreAdd">
+            <div class="row">
+                <div class="col">
+                    <div class="form-floating">
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="genreToAdd.name"
+                            required
+                        />
+                        <label>Название</label>
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        Добавить
+                    </button>
+                </div>
+            </div>
+        </form>
+
+        <div>
+            <div><strong>Статистика</strong></div>
+            <div>Количество жанров: {{ countOfGenres }}</div>
+        </div>
+
         <strong><div>Жанры</div></strong>
 
         <div
@@ -78,29 +117,7 @@ async function onUpdateGenre() {
             </button>
         </div>
 
-        <strong><div>Добавить жанр</div></strong>
-
-        <form @submit.prevent.stop="onGenreAdd">
-            <div class="row">
-                <div class="col">
-                    <div class="form-floating">
-                        <input
-                            type="text"
-                            class="form-control"
-                            v-model="genreToAdd.name"
-                            required
-                        />
-                        <label>Название</label>
-                    </div>
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">
-                        Добавить
-                    </button>
-                </div>
-            </div>
-        </form>
+        
 
         <div
             class="modal fade"

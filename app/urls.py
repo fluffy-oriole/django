@@ -21,6 +21,7 @@ from films import views
 from rest_framework.routers import DefaultRouter
 from films.api import CollectionsViewset, FilmsImagesViewset, FilmsViewset, GenresViewset, ActorsViewset, DirectorsViewset, ReviewsViewset, ProfileViewSet
 from django.conf import settings
+from debug_toolbar.toolbar import debug_toolbar_urls
 
 
 router = DefaultRouter()
@@ -34,8 +35,11 @@ router.register('profile', ProfileViewSet, basename='profile')
 router.register('film-images', FilmsImagesViewset, basename='film-images')
 
 
-urlpatterns = [
+urlpatterns = ([
     path('admin/', admin.site.urls),
     path('', views.ShowFilmsView.as_view()),
     path('api/', include(router.urls)),
 ] + static(settings.MEDIA_URL, document_root=settings.MEDIA_ROOT)
++ static(settings.STATIC_URL, document_root=settings.STATIC_ROOT)
++ debug_toolbar_urls()
+)
