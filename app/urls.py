@@ -19,7 +19,7 @@ from django.conf.urls.static import static
 from django.urls import path, include
 from films import views
 from rest_framework.routers import DefaultRouter
-from films.api import CollectionsViewset, FilmsImagesViewset, FilmsViewset, GenresViewset, ActorsViewset, DirectorsViewset, ReviewsViewset, ProfileViewSet
+from films.api import CollectionsViewset, FilmsImagesViewset, FilmsViewset, GenresViewset, ActorsViewset, DirectorsViewset, ReviewsViewset, ProfileViewSet, UsersViewset
 from django.conf import settings
 from debug_toolbar.toolbar import debug_toolbar_urls
 
@@ -33,6 +33,7 @@ router.register('reviews', ReviewsViewset, basename='reviews')
 router.register('collections', CollectionsViewset, basename='collections')
 router.register('profile', ProfileViewSet, basename='profile')
 router.register('film-images', FilmsImagesViewset, basename='film-images')
+router.register('users', UsersViewset, basename='users')
 
 
 urlpatterns = ([

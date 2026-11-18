@@ -226,6 +226,16 @@ class CollectionsViewset(
         serializer = self.StatsSerializer(instance=stats)
         return Response(data=serializer.data)
 
+class UserSerializer(serializers.ModelSerializer):
+    class Meta:
+        model = User
+        fields = '__all__'
+
+class UsersViewset(mixins.ListModelMixin,
+                GenericViewSet):
+    queryset = User.objects.all().filter(profile__role=Profile.Role.user)
+    serializer_class = UserSerializer
+
 class ProfileViewSet(mixins.ListModelMixin,
                 mixins.CreateModelMixin,
                 mixins.UpdateModelMixin,
@@ -282,3 +292,5 @@ class FilmsImagesViewset(
                 GenericViewSet):
     queryset = FilmImages.objects.all()
     serializer_class = FilmImagesSerializer
+
+

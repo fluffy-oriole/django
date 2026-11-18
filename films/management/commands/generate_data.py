@@ -55,7 +55,9 @@ class Command(BaseCommand):
             user = User.objects.create_user(
                 username=fio_translited,
                 email=f"{fio_translited}@gmail.com",
-                password="123"
+                password="123",
+                first_name=fio.split(" ")[0],
+                last_name=fio.split(" ")[1]
             )
 
             user.profile.role = 2
@@ -95,4 +97,4 @@ class Command(BaseCommand):
                 price=fake.random_int(min=100, max=1000)
             )
             collection.films.set(sample(films, k=5))
-            collection.save()
+            collection.save() 
