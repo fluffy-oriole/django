@@ -1,5 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
+from rest_framework import serializers
 from rest_framework import mixins
 from films.models import Collection, Director, Film, FilmImages, Genre, Review, Actor, Profile
 from films.serializers import DirectorSerializer, FilmImagesSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer, CollectionSerializer, ProfileSerializer
@@ -8,6 +9,7 @@ from django.contrib.auth import logout as django_logout
 from django.contrib.auth import login as django_login
 from django.contrib.auth import authenticate
 from rest_framework.decorators import action
+from django.db.models import Count, Avg, Min, Max
 
 
 class FilmsViewset(
@@ -31,6 +33,26 @@ class FilmsViewset(
                     return qs
             else:
                 return qs.filter(user=self.request.user)
+
+
+    class StatsSerializer(serializers.Serializer):
+        count = serializers.IntegerField()
+        avg = serializers.FloatField()
+        max = serializers.IntegerField()
+        min = serializers.IntegerField()
+        
+
+    @action(detail=False, url_path='stats', methods=['GET'])
+    def get_stats(self, *args, **kwargs):
+        stats = Film.objects.aggregate(
+            count=Count('id'),
+            avg=Avg('rating'),
+            max=Max('rating'),
+            min=Min('rating'),
+        )
+
+        serealizer = self.StatsSerializer(instance=stats)
+        return Response(data=serealizer.data)
 
 class GenresViewset(
                 mixins.ListModelMixin,
@@ -123,6 +145,7 @@ class ProfileViewSet(mixins.ListModelMixin,
                 mixins.RetrieveModelMixin,
                 mixins.DestroyModelMixin,
                 GenericViewSet):
+    
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
 

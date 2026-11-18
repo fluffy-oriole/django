@@ -3,24 +3,50 @@ import { ref, onBeforeMount } from 'vue';
 import Cookies from 'js-cookie';
 import axios from "axios";
 
-const films = ref([]);
+
 const loading = ref(false);
+
+const films = ref([]);
 const filmToAdd = ref({ directors: [], actors: [] });
 const filmToEdit = ref({ directors: [], actors: [] })
+
 const genres = ref([]);
 const actors = ref([]);
 const directors = ref([]);
+
 const filmPictureRef = ref();
 const filmEditPictureRef = ref();
+
 const filmAddImageUrl = ref();
 const filmEditImageUrl = ref();
+
 const showPictureModal = ref();
+
 const filmImages = ref([]);
 const filmImagesRef = ref();
+
 const filmEditImages = ref([]);
 const filmEditImagesRef = ref();
+
 const users = ref([]);
 const userIdTofilter = ref();
+
+const countOfFilms = ref(0);
+const avgRatingOfFilms = ref(0);
+const minRatingOfFilms = ref(0);
+const maxRatingOfFilms = ref(0);
+
+async function fetchFilmStats() {
+    loading.value = true;
+    const r = await axios.get('/api/films/stats/');
+    console.log(r.data);
+    countOfFilms.value = r.data.count;
+    avgRatingOfFilms.value = r.data.avg;
+    maxRatingOfFilms.value = r.data.max;
+    minRatingOfFilms.value = r.data.min;
+    console.log(countOfFilms.value, avgRatingOfFilms.value, minRatingOfFilms.value, maxRatingOfFilms.value);
+    loading.value = false;
+}
 
 async function fetchUsers() {
     loading.value = true;
@@ -64,6 +90,7 @@ async function onLoadClick() {
     await fetchActors();
     await fetchDirectors();
     await fetchUsers();
+    await fetchFilmStats();
 }
 
 
@@ -106,7 +133,6 @@ async function onFilmAdd() {
         });
     }
 
-    
     await fetchFilms();
 }
 
@@ -418,6 +444,14 @@ async function onFilterChange() {
             </div>
         </div>
         </form>
+        <div>
+            <div><strong>Статистика</strong></div>
+            <div>Количество фильмов: {{ countOfFilms }}</div>
+            <div>Средний рейтинг: {{ avgRatingOfFilms }}</div>
+            <div>Максимальный рейтинг: {{ maxRatingOfFilms }}</div>
+            <div>Минимальный рейтинг: {{ minRatingOfFilms }}</div>
+        </div>
+        
         <strong><div>Фильмы</div></strong>
         <div class="row">
             <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
@@ -426,7 +460,7 @@ async function onFilterChange() {
             </select>
         </div>
         
-        <div v-for="film in films" :key="film.id" class="container">
+        <div v-for="film in films" :key="film.id" class="container" >
             <div class="show-block">
                 {{ film.name }}
                 <div v-show="film.picture" data-bs-toggle="modal" data-bs-target="#showPictureModal" @click="showPictureModalChange(film.picture)">
@@ -442,25 +476,25 @@ async function onFilterChange() {
             </div>
             <div style="width: 500px;">
                 <div :id="`carouselExample${film.id}`" class="carousel slide">
-                <div class="carousel-inner">
-                    <div class="carousel-item active" >
-                        <img class="d-block w-100" :src="film.images?.[0]?.image" :key="film.images?.[0]?.id">
+                    <div class="carousel-inner">
+                        <div class="carousel-item active">
+                            <img class="d-block w-100" :src="film.images?.[0]?.image" :key="film.images?.[0]?.id">
+                        </div>
+                        
+                        <div data-bs-toggle="modal"  class="carousel-item" v-for="img in film.images.slice(1)" :key="img.id">
+                            <img class="d-block w-100" :src="img.image">
+                        </div>
                     </div>
-                    
-                    <div data-bs-toggle="modal"  class="carousel-item" v-for="img in film.images.slice(1)" :key="img.id">
-                        <img class="d-block w-100" :src="img.image">
-                    </div>
+                    <button class="carousel-control-prev" type="button" :data-bs-target="`#carouselExample${film.id}`" data-bs-slide="prev">
+                        <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Previous</span>
+                    </button>
+                    <button class="carousel-control-next" type="button" :data-bs-target="`#carouselExample${film.id}`" data-bs-slide="next">
+                        <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                        <span class="visually-hidden">Next</span>
+                    </button>
                 </div>
-                <button class="carousel-control-prev" type="button" :data-bs-target="`#carouselExample${film.id}`" data-bs-slide="prev">
-                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Previous</span>
-                </button>
-                <button class="carousel-control-next" type="button" :data-bs-target="`#carouselExample${film.id}`" data-bs-slide="next">
-                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
-                    <span class="visually-hidden">Next</span>
-                </button>
-                </div>
-                </div>
+            </div>
         </div>
     </div>
 </template>

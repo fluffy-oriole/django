@@ -4,4 +4,4 @@ pytest-django==4.14.0
 model-bakery==1.24.2
 Faker==40.52.0
 transliterate==1.10.2
-tqdm==4.70.1`
+tqdm==4.70.1
