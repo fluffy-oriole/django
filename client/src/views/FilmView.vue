@@ -5,8 +5,8 @@ import axios from "axios";
 
 const films = ref([]);
 const loading = ref(false);
-const filmToAdd = ref([]);
-const filmToEdit = ref([])
+const filmToAdd = ref({ directors: [], actors: [] });
+const filmToEdit = ref({ directors: [], actors: [] })
 const genres = ref([]);
 const actors = ref([]);
 const directors = ref([]);
@@ -17,6 +17,17 @@ const filmEditImageUrl = ref();
 const showPictureModal = ref();
 const filmImages = ref([]);
 const filmImagesRef = ref();
+const filmEditImages = ref([]);
+const filmEditImagesRef = ref();
+const users = ref([]);
+const userIdTofilter = ref();
+
+async function fetchUsers() {
+    loading.value = true;
+    const r = await axios.get('/api/profile/');
+    users.value = r.data;
+    loading.value = false;
+}
 
 async function fetchDirectors() {
     loading.value = true;
@@ -28,7 +39,7 @@ async function fetchDirectors() {
 async function fetchActors() {
     loading.value = true;
     const r = await axios.get('/api/actors/');
-    actors.value = r.data;
+    actors.value = r.data;  
     loading.value = false;
 }
 
@@ -41,9 +52,8 @@ async function fetchGenres() {
 
 async function fetchFilms() {
     loading.value = true;
-    const r = await axios.get("/api/films/");
+    const r = await axios.get("/api/films/", { params: { userId: userIdTofilter.value } });
     films.value = r.data;
-    console.log(r.data);
     loading.value = false;
 }
 
@@ -53,6 +63,7 @@ async function onLoadClick() {
     await fetchGenres();
     await fetchActors();
     await fetchDirectors();
+    await fetchUsers();
 }
 
 
@@ -128,9 +139,9 @@ async function onUpdateFilm() {
         formData.append('actors', a);
     }
 
-    const picture = filmEditPictureRef.value.files[0];
-    if (picture) {
-        formData.append('picture', picture);
+    const newPicture = filmEditPictureRef.value?.files?.[0];
+    if (newPicture) {
+        formData.append('picture', newPicture);
     }
 
     await axios.put(`/api/films/${filmToEdit.value.id}/`, formData, {
@@ -138,6 +149,21 @@ async function onUpdateFilm() {
             'Content-Type': 'multipart/form-data'
         }
     });
+    if (filmEditImages.value.length) {
+        for (const img of filmToEdit.value.images) {
+            await axios.delete(`/api/film-images/${img.id}/`);
+        }
+
+        for (const file of filmEditImages.value) {
+            const imageFormData = new FormData();
+            imageFormData.append('film', filmToEdit.value.id);
+            imageFormData.append('image', file);
+
+            await axios.post('/api/film-images/', imageFormData, {
+                headers: { 'Content-Type': 'multipart/form-data' }
+            });
+        }
+    }
     await fetchFilms();
 }
 
@@ -146,7 +172,14 @@ async function filmsAddPictureChange() {
 }
 
 async function filmEditPictureChange() {
-    filmEditImageUrl.value = URL.createObjectURL(filmEditPictureRef.value.files[0]);
+    const file = filmEditPictureRef.value?.files?.[0];
+    if (file) {
+        filmEditImageUrl.value = URL.createObjectURL(file);
+    }
+}
+
+async function filmEditImagesChange() {
+    filmEditImages.value = Array.from(filmEditImagesRef.value.files);
 }
 
 async function showPictureModalChange(picture) {
@@ -155,7 +188,10 @@ async function showPictureModalChange(picture) {
 
 async function filmImagesChange() {
     filmImages.value = Array.from(filmImagesRef.value.files);
-    console.log(filmImages.value);
+}
+
+async function onFilterChange() {
+    fetchFilms()
 }
 
 </script>
@@ -165,7 +201,7 @@ async function filmImagesChange() {
             <div class="modal-content">
                 <div class="modal-header">
                     <h1 class="modal-title fs-5" id="exampleModalLabel">
-                        редактировать фильм
+                        Редактировать фильм
                     </h1>
                     <button type="button" class="btn-close" data-bs-dismiss="modal" aria-label="Close"></button>
                 </div>
@@ -248,6 +284,11 @@ async function filmImagesChange() {
 
                         <div class="col-auto">
                             <img :src="filmEditImageUrl" style="max-height: 60px;" alt="">
+                        </div>
+                    </div>
+                    <div class="row">
+                        <div class="col-auto">
+                            <input type="file" class="form-control" ref="filmEditImagesRef" @change="filmEditImagesChange" multiple/>
                         </div>
                     </div>
                 </div>
@@ -378,6 +419,13 @@ async function filmImagesChange() {
         </div>
         </form>
         <strong><div>Фильмы</div></strong>
+        <div class="row">
+            <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
+                <option :value="null">Все пользователи</option>
+                <option :value="user.id" v-for="user in users">{{ user.id }}</option>
+            </select>
+        </div>
+        
         <div v-for="film in films" :key="film.id" class="container">
             <div class="show-block">
                 {{ film.name }}
@@ -392,33 +440,27 @@ async function filmImagesChange() {
                     <i class="bi bi-x"></i>
                 </button>
             </div>
-            <div>
-                <div id="ZZZZZ" class="carousel slide">
-                    <div class="d-flex justify-content-between align-items-center">
-                        <h5 class="mb-0">Top controls</h5>
-                        <div>
-                        <button class="btn-icon btn-sm" type="button" data-bs-target="#carouselStacked" data-bs-slide="prev">
-                            <span aria-hidden="true"><i class="bi-chevron-left"></i></span>
-                            <span class="visually-hidden">Previous</span>
-                        </button>
-                        <button class="btn-icon btn-sm" type="button" data-bs-target="#carouselStacked" data-bs-slide="next">
-                            <span aria-hidden="true"><i class="bi-chevron-right"></i></span>
-                            <span class="visually-hidden">Next</span>
-                        </button>
-                        </div>
+            <div style="width: 500px;">
+                <div :id="`carouselExample${film.id}`" class="carousel slide">
+                <div class="carousel-inner">
+                    <div class="carousel-item active" >
+                        <img class="d-block w-100" :src="film.images?.[0]?.image" :key="film.images?.[0]?.id">
                     </div>
-                    <div class="carousel-inner">
-                        <div class="carousel-item active" >
-                            <img class="d-block" :src="film.images?.[0]?.image" :key="film.images?.[0]?.id" style="max-height: 300px;">
-                        </div>
-                        
-                        <div data-bs-toggle="modal"  class="carousel-item" v-for="img in film.images.slice(1)" :key="img.id">
-                            <img class="d-block" :src="img.image" style="max-height: 300px;">
-                        </div>
-                        
+                    
+                    <div data-bs-toggle="modal"  class="carousel-item" v-for="img in film.images.slice(1)" :key="img.id">
+                        <img class="d-block w-100" :src="img.image">
                     </div>
                 </div>
-            </div>
+                <button class="carousel-control-prev" type="button" :data-bs-target="`#carouselExample${film.id}`" data-bs-slide="prev">
+                    <span class="carousel-control-prev-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Previous</span>
+                </button>
+                <button class="carousel-control-next" type="button" :data-bs-target="`#carouselExample${film.id}`" data-bs-slide="next">
+                    <span class="carousel-control-next-icon" aria-hidden="true"></span>
+                    <span class="visually-hidden">Next</span>
+                </button>
+                </div>
+                </div>
         </div>
     </div>
 </template>

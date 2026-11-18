@@ -22,10 +22,15 @@ class FilmsViewset(
 
     def get_queryset(self):
         qs = super().get_queryset()
-        if self.request.user.is_superuser:
-            return qs
-        else:
-            return qs.filter(user=self.request.user)
+        if (self.request.user):
+            if self.request.user.is_superuser:
+                user_id = self.request.query_params.get('userId')
+                if user_id:
+                    return qs.filter(user_id=user_id)
+                else:
+                    return qs
+            else:
+                return qs.filter(user=self.request.user)
 
 class GenresViewset(
                 mixins.ListModelMixin,
