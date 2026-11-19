@@ -470,7 +470,7 @@ async function onFilterChange() {
         <div class="row">
             <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
                 <option :value="null">Все пользователи</option>
-                <option :value="user.id" v-for="user in users">{{ user.id }}</option>
+                <option :value="user.id" v-for="user in users">{{ user.username }}</option>
             </select>
         </div>
         

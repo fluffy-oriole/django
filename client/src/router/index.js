@@ -13,27 +13,22 @@ const router = createRouter({
   routes: [
     {
       path: '/',
-      name: 'MainView',
       component: MainPage
     },
     {
       path: '/login',
-      name: 'LogInPage',
       component: LoginPage
     },
     {
       path: '/films',
-      name: 'FilmView',
       component: FilmView
     },
     {
       path: '/genres',
-      name: 'GenreView',
       component: GenreView
     },
     {
       path: '/reviews',
-      name: 'ReviewView',
       component: ReviewView
     },
     {
@@ -43,12 +38,10 @@ const router = createRouter({
     },
     {
       path: '/directors',
-      name: 'DirectorView',
       component: DirectorView
     },
     {
       path: '/collections',
-      name: 'CollectionView',
       component: CollectionView
     },
   ],
