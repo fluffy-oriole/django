@@ -15,7 +15,7 @@ const username = ref('');
 const password = ref('');
 
 async function onLoginClick() {
-    await profileStore.login(username.value, password.value);
+    profileStore.login(username.value, password.value);
 }
 
 </script>
@@ -25,7 +25,7 @@ async function onLoginClick() {
         <form style="width: 350px;" @submit.prevent.stop="onLoginClick">
             <div class="mb-3">
                 <label class="form-label">Логин</label>
-                <input v-model='username'  required type="text" class="form-control">
+                <input v-model='username' required type="text" class="form-control" id="exampleInputLogin1">
             </div>
             <div class="mb-3">
                 <label class="form-label">Пароль</label>

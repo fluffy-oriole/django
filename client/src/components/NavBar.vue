@@ -14,6 +14,7 @@ const {
 async function onLogoutButtonClick() {
     profileStore.logout();
 }
+
 </script>
 
 <template>
@@ -42,12 +43,14 @@ async function onLogoutButtonClick() {
             <li class="nav-item">
                 <router-link class="nav-link" to="/collections">Коллекции</router-link>
             </li>
+                
         </ul>
         <div role="search">
             Авторизован ли: {{ user_name }}
             <button v-if="is_authenticated" class="btn btn-outline-success" @click="onLogoutButtonClick">
                 Выйти
             </button>
+            <a v-if="!is_authenticated" class="btn btn-outline-success" href="/login">Вход</a>
         </div>
             
         
