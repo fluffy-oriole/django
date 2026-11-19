@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount, computed, watch } from 'vue';
+import { ref, onBeforeMount, computed } from 'vue';
 import Cookies from 'js-cookie';
 import axios from "axios";
 
@@ -36,16 +36,18 @@ const avgRatingOfFilms = ref(0);
 const minRatingOfFilms = ref(0);
 const maxRatingOfFilms = ref(0);
 
-const page = ref(1  );
+const page = ref(0);
 const pageItemsCount = ref(10);
-const filmsCount = ref(0);
 
-const pagesCount = computed(() => {
-    return Math.trunc(filmsCount.value / pageItemsCount.value + 1);
+const filteredFilms = computed(() => {
+    return films.value.slice(
+        page.value * pageItemsCount.value,
+        (page.value + 1) * pageItemsCount.value
+     );
 })
 
-watch(page, () => {
-    fetchFilms();
+const pagesCount = computed(() => {
+    return Math.trunc(films.value.length / pageItemsCount.value + 1);
 })
 
 async function fetchFilmStats() {
@@ -62,7 +64,7 @@ async function fetchFilmStats() {
 
 async function fetchUsers() {
     loading.value = true;
-    const r = await axios.get('/api/profile/');
+    const r = await axios.get('/api/users/');
     users.value = r.data;
     loading.value = false;
 }
@@ -90,11 +92,8 @@ async function fetchGenres() {
 
 async function fetchFilms() {
     loading.value = true;
-    const r = await axios.get('/api/films/', { params: { userId: userIdTofilter.value, page: page.value } });
-    console.log("фильмы");
-    console.log(r);
-    films.value = r.data.results;
-    filmsCount.value = r.data.count;
+    const r = await axios.get('/api/films/', { params: { userId: userIdTofilter.value } });
+    films.value = r.data;
     loading.value = false;
 }
 
@@ -475,7 +474,7 @@ async function onFilterChange() {
             </select>
         </div>
         
-        <div v-for="film in films" :key="film.id" class="container" >
+        <div v-for="film in filteredFilms" :key="film.id" class="container" >
             <div class="show-block">
                 {{ film.name }}
                 <div v-show="film.picture" data-bs-toggle="modal" data-bs-target="#showPictureModal" @click="showPictureModalChange(film.picture)">

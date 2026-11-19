@@ -1,6 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework import serializers, pagination, mixins
+from rest_framework import serializers, mixins
 from films.models import Collection, Director, Film, FilmImages, Genre, Review, Actor, Profile
 from films.serializers import DirectorSerializer, FilmImagesSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer, CollectionSerializer, ProfileSerializer
 from django.contrib.auth.models import User
@@ -21,7 +21,6 @@ class FilmsViewset(
                 GenericViewSet):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
-    pagination_class = pagination.PageNumberPagination
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -300,5 +299,3 @@ class FilmsImagesViewset(
     queryset = FilmImages.objects.all()
     serializer_class = FilmImagesSerializer
     pagination_class = None
-
-

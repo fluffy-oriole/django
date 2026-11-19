@@ -1,6 +1,6 @@
 ```vue
 <script setup>
-import { ref, onBeforeMount } from 'vue';
+import { ref, computed, onBeforeMount } from 'vue';
 import Cookies from 'js-cookie';
 import axios from 'axios';
 
@@ -14,6 +14,20 @@ const countOfCollections = ref(0);
 const avgPriceOfCollections = ref(0);
 const maxPriceOfCollections = ref(0);
 const minPriceOfCollections = ref(0);
+
+const page = ref(0);
+const pageItemsCount = ref(10);
+
+const filteredCollections = computed(() => {
+    return collections.value.slice(
+        page.value * pageItemsCount.value,
+        (page.value + 1) * pageItemsCount.value
+     );
+})
+
+const pagesCount = computed(() => {
+    return Math.trunc(collections.value.length / pageItemsCount.value + 1);
+})
 
 async function fetchCollections() {
     loading.value = true;
@@ -185,7 +199,7 @@ async function onUpdateCollection() {
 
         <strong><div>Коллекции</div></strong>
 
-        <div v-for="collection in collections" :key="collection.id" class="show-block">
+        <div v-for="collection in filteredCollections" :key="collection.id" class="show-block">
             <div>
                 <strong>{{ collection.name }}</strong>
                 <div>Цена: {{ collection.price }}</div>
@@ -214,6 +228,27 @@ async function onUpdateCollection() {
                 <i class="bi bi-x"></i>
             </button>
         </div>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <div v-if="page - 1 > 0">
+                    <li class="page-item">
+                        <a @click="page = page -1" class="page-link">Previous</a>
+                    </li>
+                </div>
+                <li @click="page = page - 1" class="page-item" v-if="page - 1 > 0"><a class="page-link" >{{ page - 1 }}</a></li>
+                <li class="page-item" v-if="page > 0"><a class="page-link" >{{ page }}</a></li>
+                <li @click="page = page + 1" class="page-item" v-if="page + 1 < pagesCount"><a class="page-link" >{{ page + 1 }}</a></li>
+                <li @click="page = page + 2" class="page-item" v-if="page + 2 < pagesCount"><a class="page-link" >{{ page + 2 }}</a></li>
+                <li @click="page = page + 3" class="page-item" v-if="page + 3 < pagesCount"><a class="page-link" >{{ page + 3 }}</a></li>
+
+                <div v-if="page < pagesCount">
+                    <li class="page-item">
+                        <a @click="page = page + 1" class="page-link" href="#">Next</a>
+                    </li>
+                </div>
+            </ul>
+        </nav>
 
         <strong><div>Добавить коллекцию</div></strong>
 
