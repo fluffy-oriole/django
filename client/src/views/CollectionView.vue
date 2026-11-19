@@ -197,59 +197,6 @@ async function onUpdateCollection() {
             <div>Минимальная цена: {{ minPriceOfCollections }}</div>
         </div>
 
-        <strong><div>Коллекции</div></strong>
-
-        <div v-for="collection in filteredCollections" :key="collection.id" class="show-block">
-            <div>
-                <strong>{{ collection.name }}</strong>
-                <div>Цена: {{ collection.price }}</div>
-
-                <div v-if="collection.films">
-                    Фильмы:
-                    <span v-if="Array.isArray(collection.films)">
-                        {{ collection.films.map(film => typeof film === 'object' ? film.name : films.find(f => f.id === film)?.name ?? film).join(', ') }}
-                    </span>
-                </div>
-            </div>
-
-            <button
-                class="btn btn-success"
-                data-bs-toggle="modal"
-                data-bs-target="#editCollectionModal"
-                @click="onCollectionEditClick(collection)"
-            >
-                <i class="bi bi-pencil"></i>
-            </button>
-
-            <button
-                class="btn btn-danger"
-                @click="onRemoveCollection(collection)"
-            >
-                <i class="bi bi-x"></i>
-            </button>
-        </div>
-
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <div v-if="page - 1 > 0">
-                    <li class="page-item">
-                        <a @click="page = page -1" class="page-link">Previous</a>
-                    </li>
-                </div>
-                <li @click="page = page - 1" class="page-item" v-if="page - 1 > 0"><a class="page-link" >{{ page - 1 }}</a></li>
-                <li class="page-item" v-if="page > 0"><a class="page-link" >{{ page }}</a></li>
-                <li @click="page = page + 1" class="page-item" v-if="page + 1 < pagesCount"><a class="page-link" >{{ page + 1 }}</a></li>
-                <li @click="page = page + 2" class="page-item" v-if="page + 2 < pagesCount"><a class="page-link" >{{ page + 2 }}</a></li>
-                <li @click="page = page + 3" class="page-item" v-if="page + 3 < pagesCount"><a class="page-link" >{{ page + 3 }}</a></li>
-
-                <div v-if="page < pagesCount">
-                    <li class="page-item">
-                        <a @click="page = page + 1" class="page-link" href="#">Next</a>
-                    </li>
-                </div>
-            </ul>
-        </nav>
-
         <strong><div>Добавить коллекцию</div></strong>
 
         <form @submit.prevent.stop="onCollectionAdd">
@@ -306,6 +253,61 @@ async function onUpdateCollection() {
                 </div>
             </div>
         </form>
+
+        <strong><div>Коллекции</div></strong>
+
+        <div v-for="collection in filteredCollections" :key="collection.id" class="show-block">
+            <div>
+                <strong>{{ collection.name }}</strong>
+                <div>Цена: {{ collection.price }}</div>
+
+                <div v-if="collection.films">
+                    Фильмы:
+                    <span v-if="Array.isArray(collection.films)">
+                        {{ collection.films.map(film => typeof film === 'object' ? film.name : films.find(f => f.id === film)?.name ?? film).join(', ') }}
+                    </span>
+                </div>
+            </div>
+
+            <button
+                class="btn btn-success"
+                data-bs-toggle="modal"
+                data-bs-target="#editCollectionModal"
+                @click="onCollectionEditClick(collection)"
+            >
+                <i class="bi bi-pencil"></i>
+            </button>
+
+            <button
+                class="btn btn-danger"
+                @click="onRemoveCollection(collection)"
+            >
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <div v-if="page - 1 > 0">
+                    <li class="page-item">
+                        <a @click="page = page -1" class="page-link">Previous</a>
+                    </li>
+                </div>
+                <li @click="page = page - 1" class="page-item" v-if="page - 1 > 0"><a class="page-link" >{{ page - 1 }}</a></li>
+                <li class="page-item" v-if="page > 0"><a class="page-link" >{{ page }}</a></li>
+                <li @click="page = page + 1" class="page-item" v-if="page + 1 < pagesCount"><a class="page-link" >{{ page + 1 }}</a></li>
+                <li @click="page = page + 2" class="page-item" v-if="page + 2 < pagesCount"><a class="page-link" >{{ page + 2 }}</a></li>
+                <li @click="page = page + 3" class="page-item" v-if="page + 3 < pagesCount"><a class="page-link" >{{ page + 3 }}</a></li>
+
+                <div v-if="page < pagesCount">
+                    <li class="page-item">
+                        <a @click="page = page + 1" class="page-link" href="#">Next</a>
+                    </li>
+                </div>
+            </ul>
+        </nav>
+
+
     </div>
 </template>
 

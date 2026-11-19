@@ -163,6 +163,51 @@ async function onUpdateDirector() {
             <div>Минимальный год рождения: {{ minBirthYearOfDirectors }}</div>
         </div>
 
+        <strong><div>Добавить режиссёра</div></strong>
+
+        <form @submit.prevent.stop="onDirectorAdd">
+            <div class="row">
+                <div class="col">
+                    <div class="form-floating">
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="directorToAdd.name"
+                            required
+                        />
+                        <label>ФИО</label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-floating">
+                        <input
+                            type="date"
+                            class="form-control"
+                            v-model="directorToAdd.birth_date"
+                        />
+                        <label>Дата рождения</label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-floating">
+                        <textarea
+                            class="form-control"
+                            v-model="directorToAdd.biography"
+                        ></textarea>
+                        <label>Биография</label>
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        Добавить
+                    </button>
+                </div>
+            </div>
+        </form>
+
         <strong><div>Режиссёры</div></strong>
 
         <div
@@ -218,50 +263,7 @@ async function onUpdateDirector() {
             </ul>
         </nav>
 
-        <strong><div>Добавить режиссёра</div></strong>
 
-        <form @submit.prevent.stop="onDirectorAdd">
-            <div class="row">
-                <div class="col">
-                    <div class="form-floating">
-                        <input
-                            type="text"
-                            class="form-control"
-                            v-model="directorToAdd.name"
-                            required
-                        />
-                        <label>ФИО</label>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="form-floating">
-                        <input
-                            type="date"
-                            class="form-control"
-                            v-model="directorToAdd.birth_date"
-                        />
-                        <label>Дата рождения</label>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="form-floating">
-                        <textarea
-                            class="form-control"
-                            v-model="directorToAdd.biography"
-                        ></textarea>
-                        <label>Биография</label>
-                    </div>
-                </div>
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">
-                        Добавить
-                    </button>
-                </div>
-            </div>
-        </form>
     </div>
 </template>
 

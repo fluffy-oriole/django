@@ -217,6 +217,60 @@ async function showPictureModalChange(picture) {
             <div>Минимальный год рождения: {{ minBirthYearOfActors }}</div>
         </div>
 
+        <strong><div>Добавить актёра</div></strong>
+
+        <form @submit.prevent.stop="onActorAdd">
+            <div class="row">
+                <div class="col">
+                    <div class="form-floating">
+                        <input
+                            type="text"
+                            class="form-control"
+                            v-model="actorToAdd.name"
+                            required
+                        />
+                        <label>ФИО</label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-floating">
+                        <input
+                            type="date"
+                            class="form-control"
+                            v-model="actorToAdd.birth_date"
+                        />
+                        <label>Дата рождения</label>
+                    </div>
+                </div>
+
+                <div class="col">
+                    <div class="form-floating">
+                        <textarea
+                            class="form-control"
+                            v-model="actorToAdd.biography"
+                        ></textarea>
+                        <label>Биография</label>
+                    </div>
+                </div>
+
+                <div class="col-auto">
+                    <input :src="actorAddImageUrl" type="file" class="form-control" ref="actorsPictureRef" @change="actorAddPictureChange">
+                </div>
+
+                <div class="col-auto">
+                    <img :src="actorAddImageUrl" style="max-height: 60px;" alt="">
+                </div>
+
+
+                <div class="col-auto">
+                    <button type="submit" class="btn btn-primary">
+                        Добавить
+                    </button>
+                </div>
+            </div>
+        </form>
+
         <strong><div>Актёры</div></strong>
 
         <div
@@ -276,59 +330,7 @@ async function showPictureModalChange(picture) {
             </ul>
         </nav>
 
-        <strong><div>Добавить актёра</div></strong>
 
-        <form @submit.prevent.stop="onActorAdd">
-            <div class="row">
-                <div class="col">
-                    <div class="form-floating">
-                        <input
-                            type="text"
-                            class="form-control"
-                            v-model="actorToAdd.name"
-                            required
-                        />
-                        <label>ФИО</label>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="form-floating">
-                        <input
-                            type="date"
-                            class="form-control"
-                            v-model="actorToAdd.birth_date"
-                        />
-                        <label>Дата рождения</label>
-                    </div>
-                </div>
-
-                <div class="col">
-                    <div class="form-floating">
-                        <textarea
-                            class="form-control"
-                            v-model="actorToAdd.biography"
-                        ></textarea>
-                        <label>Биография</label>
-                    </div>
-                </div>
-
-                <div class="col-auto">
-                    <input :src="actorAddImageUrl" type="file" class="form-control" ref="actorsPictureRef" @change="actorAddPictureChange">
-                </div>
-
-                <div class="col-auto">
-                    <img :src="actorAddImageUrl" style="max-height: 60px;" alt="">
-                </div>
-
-
-                <div class="col-auto">
-                    <button type="submit" class="btn btn-primary">
-                        Добавить
-                    </button>
-                </div>
-            </div>
-        </form>
     </div>
 </template>
 

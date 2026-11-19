@@ -198,60 +198,6 @@ async function onUpdateReview() {
             <div>Минимальная оценка: {{ minRateOfReviews }}</div>
         </div>
 
-        <strong><div>Рецензии</div></strong>
-
-        <div
-            v-for="review in filteredReviews"
-            :key="review.id"
-            class="show-block"
-        >
-            <div>
-                <strong>
-                    {{ review.film }}
-                </strong>
-                <div>{{ review.review_text }}</div>
-                <div>Автор: {{ review.author }}</div>
-                <div>Оценка: {{ review.rate }}</div>
-            </div>
-
-            <button
-                class="btn btn-success"
-                @click="onReviewEditClick(review)"
-                data-bs-toggle="modal"
-                data-bs-target="#editReviewModal"
-            >
-                <i class="bi bi-pen-fill"></i>
-            </button>
-
-            <button
-                class="btn btn-danger"
-                @click="onRemoveReview(review)"
-            >
-                <i class="bi bi-x"></i>
-            </button>
-        </div>
-
-        <nav aria-label="Page navigation example">
-            <ul class="pagination justify-content-center">
-                <div v-if="page - 1 > 0">
-                    <li class="page-item">
-                        <a @click="page = page -1" class="page-link">Previous</a>
-                    </li>
-                </div>
-                <li @click="page = page - 1" class="page-item" v-if="page - 1 > 0"><a class="page-link" >{{ page - 1 }}</a></li>
-                <li class="page-item" v-if="page > 0"><a class="page-link" >{{ page }}</a></li>
-                <li @click="page = page + 1" class="page-item" v-if="page + 1 < pagesCount"><a class="page-link" >{{ page + 1 }}</a></li>
-                <li @click="page = page + 2" class="page-item" v-if="page + 2 < pagesCount"><a class="page-link" >{{ page + 2 }}</a></li>
-                <li @click="page = page + 3" class="page-item" v-if="page + 3 < pagesCount"><a class="page-link" >{{ page + 3 }}</a></li>
-
-                <div v-if="page < pagesCount">
-                    <li class="page-item">
-                        <a @click="page = page + 1" class="page-link" href="#">Next</a>
-                    </li>
-                </div>
-            </ul>
-        </nav>
-
         <strong><div>Добавить рецензию</div></strong>
 
         <form @submit.prevent.stop="onReviewAdd">
@@ -316,6 +262,62 @@ async function onUpdateReview() {
                 </div>
             </div>
         </form>
+
+        <strong><div>Рецензии</div></strong>
+
+        <div
+            v-for="review in filteredReviews"
+            :key="review.id"
+            class="show-block"
+        >
+            <div>
+                <strong>
+                    {{ review.film }}
+                </strong>
+                <div>{{ review.review_text }}</div>
+                <div>Автор: {{ review.author }}</div>
+                <div>Оценка: {{ review.rate }}</div>
+            </div>
+
+            <button
+                class="btn btn-success"
+                @click="onReviewEditClick(review)"
+                data-bs-toggle="modal"
+                data-bs-target="#editReviewModal"
+            >
+                <i class="bi bi-pen-fill"></i>
+            </button>
+
+            <button
+                class="btn btn-danger"
+                @click="onRemoveReview(review)"
+            >
+                <i class="bi bi-x"></i>
+            </button>
+        </div>
+
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <div v-if="page - 1 > 0">
+                    <li class="page-item">
+                        <a @click="page = page -1" class="page-link">Previous</a>
+                    </li>
+                </div>
+                <li @click="page = page - 1" class="page-item" v-if="page - 1 > 0"><a class="page-link" >{{ page - 1 }}</a></li>
+                <li class="page-item" v-if="page > 0"><a class="page-link" >{{ page }}</a></li>
+                <li @click="page = page + 1" class="page-item" v-if="page + 1 < pagesCount"><a class="page-link" >{{ page + 1 }}</a></li>
+                <li @click="page = page + 2" class="page-item" v-if="page + 2 < pagesCount"><a class="page-link" >{{ page + 2 }}</a></li>
+                <li @click="page = page + 3" class="page-item" v-if="page + 3 < pagesCount"><a class="page-link" >{{ page + 3 }}</a></li>
+
+                <div v-if="page < pagesCount">
+                    <li class="page-item">
+                        <a @click="page = page + 1" class="page-link" href="#">Next</a>
+                    </li>
+                </div>
+            </ul>
+        </nav>
+
+
     </div>
 </template>
 
