@@ -1,7 +1,6 @@
 from rest_framework.response import Response
 from rest_framework.viewsets import GenericViewSet
-from rest_framework import serializers
-from rest_framework import mixins
+from rest_framework import serializers, pagination, mixins
 from films.models import Collection, Director, Film, FilmImages, Genre, Review, Actor, Profile
 from films.serializers import DirectorSerializer, FilmImagesSerializer, FilmSerializer, GenreSerializer, ReviewSerializer, ActorSerializer, CollectionSerializer, ProfileSerializer
 from django.contrib.auth.models import User
@@ -22,6 +21,7 @@ class FilmsViewset(
                 GenericViewSet):
     queryset = Film.objects.all()
     serializer_class = FilmSerializer
+    pagination_class = pagination.PageNumberPagination
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -64,6 +64,7 @@ class GenresViewset(
                 GenericViewSet):
     queryset = Genre.objects.all()
     serializer_class = GenreSerializer
+    pagination_class = None
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -94,6 +95,7 @@ class ActorsViewset(
                 GenericViewSet):
     queryset = Actor.objects.all()
     serializer_class = ActorSerializer
+    pagination_class = None
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -130,6 +132,7 @@ class DirectorsViewset(
                 GenericViewSet):
     queryset = Director.objects.all()
     serializer_class = DirectorSerializer
+    pagination_class = None
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -165,6 +168,7 @@ class ReviewsViewset(
                 GenericViewSet):
     queryset = Review.objects.all()
     serializer_class = ReviewSerializer
+    pagination_class = None
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -200,6 +204,7 @@ class CollectionsViewset(
                 GenericViewSet):
     queryset = Collection.objects.all()
     serializer_class = CollectionSerializer
+    pagination_class = None
 
     def get_queryset(self):
         qs = super().get_queryset()
@@ -229,12 +234,13 @@ class CollectionsViewset(
 class UserSerializer(serializers.ModelSerializer):
     class Meta:
         model = User
-        fields = '__all__'
+        fields = ['id', 'username', 'email', 'first_name', 'last_name']
 
 class UsersViewset(mixins.ListModelMixin,
                 GenericViewSet):
-    queryset = User.objects.all().filter(profile__role=Profile.Role.user)
+    queryset = User.objects.all().filter(profile__role=Profile.Role.user).select_related('profile')
     serializer_class = UserSerializer
+    pagination_class = None
 
 class ProfileViewSet(mixins.ListModelMixin,
                 mixins.CreateModelMixin,
@@ -245,6 +251,7 @@ class ProfileViewSet(mixins.ListModelMixin,
     
     queryset = Profile.objects.all()
     serializer_class = ProfileSerializer
+    pagination_class = None
 
     @action(detail=False, url_path='me', methods=['GET'])
     def get_me(self, request, *args, **kwargs):
@@ -292,5 +299,6 @@ class FilmsImagesViewset(
                 GenericViewSet):
     queryset = FilmImages.objects.all()
     serializer_class = FilmImagesSerializer
+    pagination_class = None
 
 

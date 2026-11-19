@@ -24,9 +24,11 @@ class Command(BaseCommand):
                     "Документальное"
         ]
 
+        print("Генерация жанров")
         for genre in genres:
             Genre.objects.create(name=genre)
-        
+
+        print("Генерация актеров, режиссеров, пользователей")
         for _ in tqdm(list(range(1000))):
             Actor.objects.create(
                 name=fake.name(),
@@ -39,12 +41,6 @@ class Command(BaseCommand):
                 birth_date=fake.date_of_birth(),
                 biography=fake.paragraph(nb_sentences=5)
             )
-
-            Genre.objects.create(
-                name=fake.word()
-            )
-
-            
             
             fio = fake.name()
             fio_translited = translit(fio, 'ru', reversed=True).lower()
@@ -67,6 +63,7 @@ class Command(BaseCommand):
         actors = list(Actor.objects.all())
         directors = list(Director.objects.all())
 
+        print("Генерация фильмов")
         for _ in tqdm(list(range(1000))):
             film = Film.objects.create(
                 name = fake.sentence(nb_words=3),
@@ -82,6 +79,7 @@ class Command(BaseCommand):
         films = list(Film.objects.all())
         profiles = list(Profile.objects.all())
 
+        print("Генерация рецензий")
         for _ in tqdm(list(range(1000))):
             review = Review.objects.create(
                 review_text=fake.paragraph(nb_sentences=5),

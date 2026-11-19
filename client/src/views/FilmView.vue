@@ -1,5 +1,5 @@
 <script setup>
-import { ref, onBeforeMount } from 'vue';
+import { ref, onBeforeMount, computed, watch } from 'vue';
 import Cookies from 'js-cookie';
 import axios from "axios";
 
@@ -35,6 +35,18 @@ const countOfFilms = ref(0);
 const avgRatingOfFilms = ref(0);
 const minRatingOfFilms = ref(0);
 const maxRatingOfFilms = ref(0);
+
+const page = ref(1  );
+const pageItemsCount = ref(10);
+const filmsCount = ref(0);
+
+const pagesCount = computed(() => {
+    return Math.trunc(filmsCount.value / pageItemsCount.value + 1);
+})
+
+watch(page, () => {
+    fetchFilms();
+})
 
 async function fetchFilmStats() {
     loading.value = true;
@@ -78,8 +90,11 @@ async function fetchGenres() {
 
 async function fetchFilms() {
     loading.value = true;
-    const r = await axios.get("/api/films/", { params: { userId: userIdTofilter.value } });
-    films.value = r.data;
+    const r = await axios.get('/api/films/', { params: { userId: userIdTofilter.value, page: page.value } });
+    console.log("фильмы");
+    console.log(r);
+    films.value = r.data.results;
+    filmsCount.value = r.data.count;
     loading.value = false;
 }
 
@@ -496,6 +511,26 @@ async function onFilterChange() {
                 </div>
             </div>
         </div>
+        <nav aria-label="Page navigation example">
+            <ul class="pagination justify-content-center">
+                <div v-if="page - 1 > 0">
+                    <li class="page-item">
+                        <a @click="page = page -1" class="page-link">Previous</a>
+                    </li>
+                </div>
+                <li @click="page = page - 1" class="page-item" v-if="page - 1 > 0"><a class="page-link" >{{ page - 1 }}</a></li>
+                <li class="page-item" v-if="page > 0"><a class="page-link" >{{ page }}</a></li>
+                <li @click="page = page + 1" class="page-item" v-if="page + 1 < pagesCount"><a class="page-link" >{{ page + 1 }}</a></li>
+                <li @click="page = page + 2" class="page-item" v-if="page + 2 < pagesCount"><a class="page-link" >{{ page + 2 }}</a></li>
+                <li @click="page = page + 3" class="page-item" v-if="page + 3 < pagesCount"><a class="page-link" >{{ page + 3 }}</a></li>
+
+                <div v-if="page < pagesCount">
+                    <li class="page-item">
+                        <a @click="page = page + 1" class="page-link" href="#">Next</a>
+                    </li>
+                </div>
+            </ul>
+        </nav>
     </div>
 </template>
 
