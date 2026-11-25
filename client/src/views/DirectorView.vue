@@ -7,6 +7,10 @@ const directors = ref([]);
 const loading = ref(false);
 const directorToAdd = ref({});
 const directorToEdit = ref({});
+const users = ref([]);
+const userIdTofilter = ref();
+
+
 const countOfDirectors = ref(0);
 const avgBirthYearOfDirectors = ref(0);
 const maxBirthYearOfDirectors = ref(0);
@@ -29,11 +33,18 @@ const pagesCount = computed(() => {
 async function fetchDirectors() {
     loading.value = true;
     try {
-        const r = await axios.get('/api/directors/');
+        const r = await axios.get('/api/directors/', { params: { userId: userIdTofilter.value } });
         directors.value = r.data;
     } finally {
         loading.value = false;
     }
+}
+
+async function fetchUsers() {
+    loading.value = true;
+    const r = await axios.get('/api/users/');
+    users.value = r.data;
+    loading.value = false;
 }
 
 async function fetchStats() {
@@ -47,6 +58,7 @@ async function fetchStats() {
 onBeforeMount(() => {
     axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
     fetchDirectors();
+    fetchUsers();
     fetchStats();
 });
 
@@ -76,6 +88,9 @@ async function onUpdateDirector() {
     });
     await fetchDirectors();
     await fetchStats();
+}
+async function onFilterChange() {
+    fetchDirectors()
 }
 </script>
 
@@ -209,6 +224,13 @@ async function onUpdateDirector() {
         </form>
 
         <strong><div>Режиссёры</div></strong>
+
+        <div class="row">
+            <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
+                <option :value="null">Все пользователи</option>
+                <option :value="user.id" v-for="user in users">{{ user.username }}</option>
+            </select>
+        </div>
 
         <div
             v-for="director in filteredDirectors"

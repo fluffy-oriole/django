@@ -7,8 +7,11 @@ import axios from 'axios';
 const collections = ref([]);
 const films = ref([]);
 const loading = ref(false);
-const collectionToAdd = ref({});
-const collectionToEdit = ref({});
+const collectionToAdd = ref({ films: [] });
+const collectionToEdit = ref({ films: [] });
+
+const users = ref([]);
+const userIdTofilter = ref();
 
 const countOfCollections = ref(0);
 const avgPriceOfCollections = ref(0);
@@ -32,7 +35,7 @@ const pagesCount = computed(() => {
 async function fetchCollections() {
     loading.value = true;
     try {
-        const r = await axios.get('/api/collections/');
+        const r = await axios.get('/api/collections/', { params: { userId: userIdTofilter.value } });
         collections.value = r.data;
     } finally {
         loading.value = false;
@@ -42,6 +45,13 @@ async function fetchCollections() {
 async function fetchFilms() {
     const r = await axios.get('/api/films/');
     films.value = r.data;
+}
+
+async function fetchUsers() {
+    loading.value = true;
+    const r = await axios.get('/api/users/');
+    users.value = r.data;
+    loading.value = false;
 }
 
 async function fetchStats() {
@@ -56,6 +66,7 @@ async function onLoadClick() {
     await Promise.all([
         fetchCollections(),
         fetchFilms(),
+        fetchUsers(),
         fetchStats()
     ]);
 }
@@ -102,6 +113,9 @@ async function onUpdateCollection() {
     await fetchStats();
 }
 
+async function onFilterChange() {
+    fetchCollections()
+}
 </script>
 
 <template>
@@ -255,6 +269,13 @@ async function onUpdateCollection() {
         </form>
 
         <strong><div>Коллекции</div></strong>
+
+        <div class="row">
+            <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
+                <option :value="null">Все пользователи</option>
+                <option :value="user.id" v-for="user in users">{{ user.username }}</option>
+            </select>
+        </div>
 
         <div v-for="collection in filteredCollections" :key="collection.id" class="show-block">
             <div>

@@ -12,7 +12,10 @@ const actorAddImageUrl = ref();
 const actorEditImageRef = ref();
 const actorEditImageUrl = ref();
 const showPictureModal = ref();
-const countOfActors = ref(0);
+const users = ref([]);
+const userIdTofilter = ref();
+
+const countOfActors = ref(0); 
 const avgBirthYearOfActors = ref(0);
 const maxBirthYearOfActors = ref(0);
 const minBirthYearOfActors = ref(0);
@@ -34,8 +37,15 @@ const pagesCount = computed(() => {
 
 async function fetchActors() {
     loading.value = true;
-    const r = await axios.get('/api/actors/');
+    const r = await axios.get('/api/actors/', { params: { userId: userIdTofilter.value } });
     actors.value = r.data;
+    loading.value = false;
+}
+
+async function fetchUsers() {
+    loading.value = true;
+    const r = await axios.get('/api/users/');
+    users.value = r.data;
     loading.value = false;
 }
 
@@ -50,6 +60,7 @@ async function fetchStats() {
 onBeforeMount(() => {
     axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
     fetchActors();
+    fetchUsers();
     fetchStats();
 });
 
@@ -114,6 +125,9 @@ async function showPictureModalChange(picture) {
     showPictureModal.value = picture;
 }
 
+async function onFilterChange() {
+    fetchActors()
+}
 </script>
 
 <template>
@@ -272,6 +286,13 @@ async function showPictureModalChange(picture) {
         </form>
 
         <strong><div>Актёры</div></strong>
+
+        <div class="row">
+            <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
+                <option :value="null">Все пользователи</option>
+                <option :value="user.id" v-for="user in users">{{ user.username }}</option>
+            </select>
+        </div>
 
         <div
             v-for="actor in filteredActors"

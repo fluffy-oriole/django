@@ -8,10 +8,14 @@ const loading = ref(false);
 const genreToAdd = ref({});
 const genreToEdit = ref({});
 
+const users = ref([]);
+const userIdTofilter = ref();
+
 const countOfGenres = ref(0);
 
 const page = ref(0);
 const pageItemsCount = ref(10);
+
 
 const filteredGenres = computed(() => {
     return genres.value.slice(
@@ -24,6 +28,13 @@ const pagesCount = computed(() => {
     return Math.trunc(genres.value.length / pageItemsCount.value + 1);
 })
 
+async function fetchUsers() {
+    loading.value = true;
+    const r = await axios.get('/api/users/');
+    users.value = r.data;
+    loading.value = false;
+}
+
 async function fetchStats() {
     const r = await axios.get('/api/genres/stats');
     console.log(r.data.count);
@@ -33,7 +44,7 @@ async function fetchStats() {
 
 async function fetchGenres() {
     loading.value = true;
-    const r = await axios.get('/api/genres/');
+    const r = await axios.get('/api/genres/', { params: { userId: userIdTofilter.value } });
     console.log(r.data);
     genres.value = r.data;
     loading.value = false;
@@ -42,6 +53,7 @@ async function fetchGenres() {
 onBeforeMount(() => {
     axios.defaults.headers.common['X-CSRFToken'] = Cookies.get('csrftoken');
     fetchGenres();
+    fetchUsers();
     fetchStats();
 });
 
@@ -69,6 +81,9 @@ async function onUpdateGenre() {
     });
 
     await fetchGenres();
+}
+async function onFilterChange() {
+    fetchGenres()
 }
 </script>
 
@@ -106,6 +121,13 @@ async function onUpdateGenre() {
         </div>
 
         <strong><div>Жанры</div></strong>
+
+        <div class="row">
+            <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
+                <option :value="null">Все пользователи</option>
+                <option :value="user.id" v-for="user in users">{{ user.username }}</option>
+            </select>
+        </div>
 
         <div
             v-for="genre in filteredGenres"

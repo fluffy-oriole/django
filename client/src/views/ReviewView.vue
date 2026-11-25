@@ -9,6 +9,8 @@ const loading = ref(false);
 const reviewToAdd = ref({});
 const reviewToEdit = ref({})
 const profiles = ref([]);
+const users = ref([]);
+const userIdTofilter = ref();
 
 const countOfReviews = ref(0);
 const avgRateOfReviews = ref(0);
@@ -32,7 +34,7 @@ const pagesCount = computed(() => {
 async function fetchReviews() {
     loading.value = true;
     try {
-        const r = await axios.get('/api/reviews/');
+        const r = await axios.get('/api/reviews/', { params: { userId: userIdTofilter.value } });
         reviews.value = r.data;
     } finally {
         loading.value = false;
@@ -44,9 +46,16 @@ async function fetchFilms() {
     films.value = r.data;
 }
 
-async function fetchUsers() {
+async function fetchProfiles() {
     const r = await axios.get('/api/profile/');
     profiles.value = r.data;
+}
+
+async function fetchUsers() {
+    loading.value = true;
+    const r = await axios.get('/api/users/');
+    users.value = r.data;
+    loading.value = false;
 }
 
 async function fetchStats() {
@@ -61,6 +70,7 @@ async function onLoadClick() {
     await Promise.all([
         fetchReviews(),
         fetchFilms(),
+        fetchProfiles(),
         fetchUsers(),
         fetchStats()
     ]);
@@ -100,6 +110,9 @@ async function onUpdateReview() {
     await fetchStats();
 }
 
+async function onFilterChange() {
+    fetchReviews()
+}
 </script>
 
 <template>
@@ -264,6 +277,13 @@ async function onUpdateReview() {
         </form>
 
         <strong><div>Рецензии</div></strong>
+
+        <div class="row">
+            <select class="form-select" v-model="userIdTofilter" @change="onFilterChange">
+                <option :value="null">Все пользователи</option>
+                <option :value="user.id" v-for="user in users">{{ user.username }}</option>
+            </select>
+        </div>
 
         <div
             v-for="review in filteredReviews"
